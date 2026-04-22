@@ -1,0 +1,33 @@
+<section class="seller-sales">
+  <header class="admin-header"><h2>Mis Ventas</h2></header>
+  <div class="admin-container">
+    <div *ngIf="loading">Cargando perfil de vendedor y ventas...</div>
+    <div *ngIf="loading && !loadingSales">Cargando ventas relacionadas...</div>
+    <div *ngIf="!loadingSales && sellerSales.length === 0">Aún no tenés ventas relacionadas con tu inventario.</div>
+    <div *ngIf="!loadingSales && sellerSales.length > 0" class="sales-list">
+      <article *ngFor="let s of sellerSales" class="seller-sale-card">
+        <div class="seller-sale-grid">
+          <div class="seller-sale-meta">
+            <div class="order-number">Pedido #{{ s.id }}</div>
+            <div class="order-date">{{ s.date }}</div>
+            <div class="order-total">Total: $ {{ getSaleTotal(s) }}</div>
+          </div>
+
+          <div class="seller-sale-cardinfo">
+          </div>
+
+          <div class="seller-sale-items">
+            <ul>
+              <li *ngFor="let it of getSaleSummary(s)" class="seller-sale-item">
+                <div class="seller-item-name">{{ it.book.name }}</div>
+                <div class="seller-item-qty">x{{ it.quantity }}</div>
+                <div class="seller-item-sub">$ {{ it.subtotal }}</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div *ngIf="loadingSales">Cargando ventas...</div>
+  </div>
+</section>

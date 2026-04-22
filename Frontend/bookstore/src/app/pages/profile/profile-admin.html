@@ -1,0 +1,24 @@
+<div class="profile-admin-root">
+  <header class="profile-title">
+    <h2>Perfil de Administrador</h2>
+  </header>
+
+  @if (isAdminRoot && auth.userSignal()) {
+  <div class="profile-details">
+    <p class="profile-email">
+      <strong>Email:</strong> {{ auth.userSignal()!.email || auth.userSignal()!.name }}
+    </p>
+    <p class="profile-role">
+      <strong>Roles: </strong>
+      @if ((auth.userSignal()!.roles || []).length) {
+      <span *ngFor="let r of auth.userSignal()!.roles; let last = last">
+        {{ roleLabel(r) }}@if (!last) {<span>, </span>}
+      </span>
+      } @else { — }
+    </p>
+  </div>
+  }
+  <div class="admin-subpage">
+    <router-outlet></router-outlet>
+  </div>
+</div>

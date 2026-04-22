@@ -1,0 +1,92 @@
+.register-container {
+  margin: 24px auto;
+  padding: 2rem;
+  border-radius: 8px;
+  position: relative;
+  background: var(--container-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: var(--normal-font-size);
+  width: min(90vw, 420px);
+}
+
+form h2 {
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.form-row {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+.form-row label {
+  margin-bottom: 6px;
+  color: var(--text-color);
+  font-weight: var(--font-semi-bold);
+  font-size: var(--normal-font-size);
+}
+.form-row input {
+  padding: 0.6rem;
+  font-size: var(--normal-font-size);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+.input-error {
+  border-color: #b00020;
+  box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.06);
+}
+.error {
+  color: #b00020;
+  margin-bottom: 12px;
+}
+
+.close-btn {
+  position: absolute;
+  top: -5px;
+  right: -180px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-color);
+  padding: 6px;
+  border-radius: 4px;
+}
+.close-btn:hover,
+.close-btn:focus {
+  color: var(--first-color);
+  outline: none;
+}
+
+button {
+  margin-top: 20px;
+  font-size: var(--normal-font-size);
+  cursor: pointer;
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--first-color);
+  color: var(--white-color);
+  border: none;
+  border-radius: 8px;
+  font-weight: var(--font-semi-bold);
+}
+
+.secondary-actions {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.secondary-link {
+  color: var(--text-color);
+  transition: color 0.4s;
+}
+
+.secondary-link:hover {
+  color: var(--first-color);
+  text-decoration: none;
+  cursor: pointer;
+}

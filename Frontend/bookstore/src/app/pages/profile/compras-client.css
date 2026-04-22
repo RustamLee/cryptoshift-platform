@@ -1,0 +1,18 @@
+:root{
+  --card-bg: var(--container-color);
+  --muted: var(--text-color);
+}
+.compras-page .admin-header h2{ margin-bottom: 12px }
+.purchases-list{ display:flex; flex-direction:column; gap:14px }
+.purchase-card{ background:var(--card-bg); border:1px solid var(--border-color); padding:10px; border-radius:10px; box-shadow: var(--header-shadow); }
+.purchase-grid{ display:grid; grid-template-columns: 220px 220px 1fr; gap:12px; align-items:start }
+.purchase-meta .order-number{ font-weight:700; font-size:1.05rem }
+.purchase-meta .order-date{ color:var(--muted); margin-top:6px }
+.purchase-meta .order-total{ margin-top:8px; font-weight:600 }
+.purchase-cardinfo{ color:var(--muted) }
+.purchase-items ul{ list-style:none; padding:0; margin:0 }
+.sale-item{ display:grid; grid-template-columns: 1fr 56px 80px; gap:8px; padding:8px 0; border-bottom:1px dashed rgba(0,0,0,0.04) }
+.sale-item:last-child{ border-bottom:none }
+.item-name{ font-weight:600 }
+.item-qty, .item-sub{ color:var(--muted); text-align:right }
+@media (max-width:900px){ .purchase-grid{ grid-template-columns: 1fr; } .purchase-card{ padding:12px } }

@@ -1,0 +1,38 @@
+@if (showLoginForm) {
+<div class="register-container">
+  <button class="close-btn" aria-label="Cerrar" (click)="close()">×</button>
+  <form (ngSubmit)="submit()">
+    <div class="form-row">
+      <h2>Iniciar sesión</h2>
+      <label for="name">E-mail</label>
+      <input id="name" name="name" [(ngModel)]="name" placeholder="ejemplo@correo.com" />
+    </div>
+
+    <div class="form-row">
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" [(ngModel)]="password" />
+    </div>
+
+    @if (error) {
+    <div class="error">{{ error }}</div>
+    }
+
+    <button type="button" (click)="submit()" [disabled]="loading">
+      {{ loading ? '...' : 'Ingresar' }}
+    </button>
+    <div class="secondary-actions">
+      <a routerLink="/register" class="secondary-link">¿No tenés cuenta? Creá una</a>
+    </div>
+  </form>
+</div>
+} @if (showRoleChoice) {
+<div class="role-backdrop" (click)="$event.stopPropagation()">
+  <div class="role-modal small" (click)="$event.stopPropagation()">
+    <h4>Ingresar como:</h4>
+    <div class="modal-actions">
+      <button class="btn-primary" (click)="chooseRole('client')">Cliente</button>
+      <button class="btn-primary" (click)="chooseRole('seller')">Vendedor</button>
+    </div>
+  </div>
+</div>
+}

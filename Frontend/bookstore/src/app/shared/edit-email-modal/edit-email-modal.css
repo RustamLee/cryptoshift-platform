@@ -1,0 +1,26 @@
+.confirm-message {
+  margin: 0.5rem 0 1rem 0;
+  color: var(--text-color);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-error {
+  margin-top: 0.75rem;
+  color: #c62828;
+}
+
+.processing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.5rem 0 1rem 0;
+}
+.processing-text {
+  font-weight: 600;
+  color: var(--text-color);
+}
+

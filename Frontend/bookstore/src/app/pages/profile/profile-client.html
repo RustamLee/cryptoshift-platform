@@ -1,0 +1,160 @@
+<section class="profile-content">
+  <header class="profile-title">
+    <h2>Perfil del Cliente</h2>
+  </header>
+
+  <ng-container *ngIf="auth.userSignal() as user">
+    <div class="profile-header">
+      <div class="profile-header__avatar">
+        <div class="avatar-circle">{{ (user.name || '').slice(0, 2).toUpperCase() }}</div>
+        <div class="profile-info">
+          <div class="profile-email">{{ user.email || user.name }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-details">
+      <div class="profile-email-row">
+        <p class="profile-email">
+          <strong>Email:</strong> {{ user.email || user.name }}
+        </p>
+        <button class="edit-email" title="Cambiar Email" (click)="openEmailModal()">
+          <i class="ri-edit-line"></i>
+        </button>
+      </div>
+
+      <p class="profile-role">
+        <strong>Roles: </strong>
+        {{ rolesLabel(user.roles) }}
+      </p>
+
+      <ng-container *ngIf="sellerRequest() as request">
+        <div class="seller-request-status">
+          <p class="status-title"><strong>Estado de solicitud de vendedor:</strong></p>
+          <div [ngSwitch]="request.status">
+            <div *ngSwitchCase="'PENDING'" class="status-pending">
+              <span class="status-badge">En revisión</span>
+              <p class="status-message">Tu solicitud está siendo revisada por el administrador.</p>
+              <button class="btn-secondary btn-sm" (click)="withdrawSellerRequest()">Retirar solicitud</button>
+            </div>
+            <div *ngSwitchCase="'APPROVED'" class="status-approved">
+              <span class="status-badge">Aprobada</span>
+              <p class="status-message">Tu solicitud ha sido aprobada. Ahora eres vendedor.</p>
+              <button class="btn-primary btn-sm" (click)="router.navigate(['/profile', 'seller'])">Ir a panel de vendedor</button>
+            </div>
+            <div *ngSwitchCase="'REJECTED'" class="status-rejected">
+              <span class="status-badge">Rechazada</span>
+              <p class="status-message">Tu solicitud fue rechazada.</p>
+              <p *ngIf="request.rejectionReason" class="rejection-reason"><strong>Motivo:</strong> {{ request.rejectionReason }}</p>
+              <button class="btn-secondary btn-sm" (click)="onSellClick()">Enviar nueva solicitud</button>
+            </div>
+            <div *ngSwitchDefault>—</div>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </ng-container>
+</section>
+
+<ng-container *ngIf="showSellerModal">
+  <div class="modal" (click)="onModalBackdropClick()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" aria-label="Cerrar" (click)="onModalCloseClick()">×</button>
+      <h3>Registro como vendedor</h3>
+      <div class="modal-field">
+        <label for="sellerName">El nombre de empresa</label>
+        <input id="sellerName" name="sellerName" [(ngModel)]="sellerName" required [disabled]="isRegistering" />
+        <div *ngIf="sellerName && sellerName.trim().length > 0 && sellerName.trim().length < 6" class="field-hint">El nombre debe tener al menos 6 caracteres.</div>
+      </div>
+      <div class="modal-field">
+        <label for="sellerAddress">La direccion</label>
+        <input id="sellerAddress" name="sellerAddress" [(ngModel)]="sellerAddress" required [disabled]="isRegistering" />
+        <div *ngIf="sellerAddress && sellerAddress.trim().length > 0 && sellerAddress.trim().length < 6" class="field-hint">La dirección debe tener al menos 6 caracteres.</div>
+      </div>
+      <div class="modal-field">
+        <label for="sellerAfipNumber">El número de AFIP</label>
+        <input
+          id="sellerAfipNumber"
+          name="sellerAfipNumber"
+          maxlength="13"
+          inputmode="numeric"
+          [(ngModel)]="sellerAfipNumber"
+          (beforeinput)="onBeforeInputAfip($event)"
+          (input)="onAfipNumberInput($event)"
+          (keydown)="allowDigitKeydown($event)"
+          (paste)="onPasteAfip($event)"
+          (blur)="onBlur('afip')"
+          (focus)="onFocus('afip')"
+          [disabled]="isRegistering"
+        />
+        <div class="field-hint">Formato: XX-XXXXXXXX-X</div>
+        <div *ngIf="afipTouched && !isAfipNumberValid(_afipDigits)" class="field-error">Número inválido — debe tener exactamente 11 dígitos.</div>
+      </div>
+      <div class="modal-actions">
+        <button
+          class="btn-primary"
+          (click)="submitSellerRegistration()"
+          [disabled]="
+            isRegistering ||
+            !sellerName.trim() ||
+            !sellerAddress.trim() ||
+            sellerName.trim().length < 6 ||
+            sellerAddress.trim().length < 6 ||
+            !isAfipNumberValid(_afipDigits)
+          "
+        >
+          <span *ngIf="isRegistering" class="spinner" aria-hidden="true"></span>
+          <span *ngIf="!isRegistering">Continuar</span>
+          <span *ngIf="isRegistering">Procesando...</span>
+        </button>
+        <button class="btn-secondary" (click)="onModalCloseClick()" [disabled]="isRegistering">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<app-confirm-dialog
+  [visible]="showWithdrawConfirm"
+  title="Retirar solicitud"
+  message="¿Está seguro de que desea retirar su solicitud?"
+  confirmLabel="Retirar"
+  cancelLabel="Cancelar"
+  [loading]="withdrawLoading"
+  [errorMessage]="withdrawError"
+  (confirm)="onConfirmWithdraw()"
+  (cancel)="onCancelWithdraw()"
+></app-confirm-dialog>
+
+<ng-container *ngIf="showEmailModal">
+  <div class="modal" (click)="closeEmailModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" aria-label="Cerrar" (click)="closeEmailModal()">×</button>
+      <ng-container *ngIf="emailModalStep === 1">
+        <h3>Confirmación de acción</h3>
+        <p>Introduzca la contraseña actual para cambiar Email</p>
+        <div class="modal-field">
+          <label for="emailConfirmPass">Contraseña</label>
+          <input id="emailConfirmPass" name="emailConfirmPass" type="password" [(ngModel)]="emailCurrentPassword" [disabled]="isUpdatingEmail" />
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" (click)="submitEmailStep1()" [disabled]="isUpdatingEmail || !emailCurrentPassword">Continuar</button>
+          <button class="btn-secondary" (click)="closeEmailModal()" [disabled]="isUpdatingEmail">Cancelar</button>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="emailModalStep === 2">
+        <h3>Nuevo Email</h3>
+        <div class="modal-field">
+          <label for="newEmail">Email</label>
+          <input id="newEmail" name="newEmail" [(ngModel)]="newEmail" [disabled]="isUpdatingEmail" />
+          <div *ngIf="newEmail && newEmail.trim().length < 8" class="field-hint">Email debe tener al menos 8 caracteres.</div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" (click)="submitEmailStep2()" [disabled]="isUpdatingEmail || newEmail.trim().length < 8">Guardar</button>
+          <button class="btn-secondary" (click)="closeEmailModal()" [disabled]="isUpdatingEmail">Cancelar</button>
+        </div>
+      </ng-container>
+      <div *ngIf="emailUpdateError" class="error">{{ emailUpdateError }}</div>
+    </div>
+  </div>
+</ng-container>

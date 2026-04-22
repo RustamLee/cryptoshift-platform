@@ -1,0 +1,61 @@
+<section class="admin-page">
+  <header class="admin-header">
+    <h2>Gestión de Usuarios</h2>
+  </header>
+
+  <div class="admin-container">
+    <app-profile-table
+      [columns]="['Nombre', 'Roles', 'Estado']"
+      [keys]="['name', 'roles', 'status']"
+      [rows]="users"
+      [actionsTemplate]="userActions"
+    ></app-profile-table>
+
+    <ng-template #userActions let-row>
+      <button class="btn-small" title="Editar email" (click)="openEditEmail(row)">
+        <i class="ri-edit-line"></i>
+      </button>
+      <button class="btn-small" title="Resetear contraseña" (click)="openResetPassword(row)">
+        <i class="ri-key-2-line"></i>
+      </button>
+      <ng-container *ngIf="row.deletable; else notDeletable">
+        <button class="btn-small danger" title="Eliminar" (click)="deleteUser(row)">
+          <i class="ri-delete-bin-5-line"></i>
+        </button>
+      </ng-container>
+      <ng-template #notDeletable>
+        <button class="btn-small" title="Activar/Desactivar" (click)="toggleStatus(row)">
+          <i [class]="row.status === 'ACTIVE' ? 'ri-toggle-fill' : 'ri-toggle-line'"></i>
+        </button>
+      </ng-template>
+    </ng-template>
+  </div>
+    <app-edit-email-modal
+      [visible]="showEditModal"
+      [name]="modalRow?.name"
+      [loading]="modalLoading"
+      [errorMessage]="modalError"
+      (confirm)="onEditEmailConfirm($event)"
+      (cancel)="onEditEmailCancel()"
+    ></app-edit-email-modal>
+
+    <app-reset-password-modal
+      [visible]="showResetModal"
+      [loading]="modalLoading"
+      [errorMessage]="modalError"
+      (confirm)="onResetPasswordConfirm($event)"
+      (cancel)="onResetPasswordCancel()"
+    ></app-reset-password-modal>
+
+  <app-confirm-dialog
+    [visible]="showDeleteModal"
+    [title]="'Confirmar eliminación'"
+    [message]="deleteMessage"
+    [errorMessage]="deleteError"
+    [confirmLabel]="'Eliminar'"
+    [cancelLabel]="'Cancelar'"
+    [loading]="deleting"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  ></app-confirm-dialog>
+</section>

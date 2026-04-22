@@ -1,0 +1,250 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+:root {
+  --first-color: hsl(230, 62%, 56%);
+  --title-color: hsl(230, 70%, 16%);
+  --text-color: hsl(230, 16%, 45%);
+  --border-color: hsl(230, 50%, 90%);
+  --white-color: hsl(0, 0%, 100%);
+  --body-color: hsl(230, 100%, 96%);
+  --container-color: hsl(230, 100%, 97%);
+
+  --body-font: 'Montserrat', sans-serif;
+  --h2-font-size: 1.25rem;
+  --normal-font-size: 0.938rem;
+
+  --font-regular: 400;
+  --font-semi-bold: 600;
+  --font-bold: 700;
+
+  --z-tooltip: 10;
+  --z-fixed: 100;
+  --header-shadow: 0 1px 6px rgba(16, 24, 40, 0.06);
+  --header-border: rgba(16, 24, 40, 0.06);
+  --footer-shadow: 0 1px 6px rgba(16, 24, 40, 0.04);
+  --footer-border: rgba(16, 24, 40, 0.04);
+  --header-height: 6rem;
+  --menu-item-hover: rgba(0, 0, 0, 0.03);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+:root,
+html,
+body{
+  height: 100%;
+  margin: 0;
+}
+
+body,
+input,
+button {
+  font-family: var(--body-font);
+  font-size: var(--normal-font-size);
+}
+
+body {
+  background-color: var(--body-color);
+  color: var(--text-color);
+  transition: background-color 0.4s;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+@media screen and (min-width: 1150px) {
+  :root {
+    --h2-font-size: 1.5rem;
+    --normal-font-size: 1rem;
+  }
+}
+
+body.dark-theme {
+  --title-color: hsl(230, 48%, 85%);
+  --text-color: hsl(230, 16%, 70%);
+  --border-color: hsl(230, 12%, 18%);
+  --body-color: hsl(230, 12%, 8%);
+  --container-color: hsl(230, 12%, 12%);
+  --header-shadow: 0 1px 8px rgba(255, 255, 255, 0.12);
+  --header-border: rgba(255, 255, 255, 0.06);
+  --footer-shadow: 0 -1px 8px rgba(255, 255, 255, 0.03);
+  --footer-border: rgba(255, 255, 255, 0.04);
+  --menu-item-hover: rgba(255, 255, 255, 0.06);
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  justify-items: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 519px) {
+  .books-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+@media (min-width: 520px) and (max-width: 767px) {
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .books-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.18s ease;
+  font-size: inherit;
+}
+.modal-close:hover,
+.modal-close:focus,
+.modal-close:focus-visible {
+  color: var(--first-color);
+  outline: none;
+  background: transparent;
+}
+
+/* Global modal and button styles used across the app */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+}
+.modal-content {
+  width: min(90vw, 420px);
+  padding: 2rem;
+  border-radius: 8px;
+  position: relative;
+  background: var(--container-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: var(--normal-font-size);
+}
+.modal-content h3 { margin-bottom: 12px; }
+/* Center modal inner content */
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.modal-close {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  font-size: 1.25rem;
+}
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* Ensure buttons in the cart "no cards" empty actions match confirm-dialog buttons */
+.no-cards .modal-actions {
+  margin-top: 0.75rem;
+}
+.no-cards .modal-actions .btn-primary,
+.no-cards .modal-actions .btn-secondary {
+  padding: 0.75rem 1rem; /* same vertical padding as .btn-secondary used elsewhere */
+  min-width: 140px; /* give buttons equal minimum width */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  border-radius: 8px;
+}
+.no-cards .modal-actions .btn-primary { padding-left: 1rem; padding-right: 1rem; }
+
+/* Ensure form fields inside modals stretch full width and labels are left-aligned */
+.modal-content .modal-field {
+  width: 100%;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+.modal-content .modal-field label {
+  text-align: left;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.modal-content .modal-field input,
+.modal-content .modal-field select,
+.modal-content .modal-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Global button styles */
+.btn-primary {
+  background: var(--first-color, #0066ff);
+  color: var(--white-color);
+  border: none;
+  padding: 0.3rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: var(--font-semi-bold);
+  font-size: var(--normal-font-size);
+}
+.btn-primary[disabled],
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: var(--normal-font-size);
+  cursor: pointer;
+  color: var(--text-color);
+}

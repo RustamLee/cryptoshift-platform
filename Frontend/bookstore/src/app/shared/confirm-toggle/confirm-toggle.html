@@ -1,0 +1,11 @@
+<div class="modal" *ngIf="show" (click)="cancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" aria-label="Cerrar" (click)="cancel()">×</button>
+    <h3>{{ payload?.title || 'Cambiar perfil' }}</h3>
+    <p>{{ payload?.message || '¿Deseas cambiar de perfil?' }}</p>
+    <div class="modal-actions">
+      <button class="btn-primary" (click)="confirm()">Sí, continuar</button>
+      <button class="btn-secondary" (click)="cancel()">Cancelar</button>
+    </div>
+  </div>
+</div>

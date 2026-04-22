@@ -1,0 +1,70 @@
+<div *ngIf="loading" class="home__loading">Cargando libros...</div>
+
+<div *ngIf="errorMessage" class="home__error">{{ errorMessage }}</div>
+
+<div *ngIf="!loading && books.length === 0" class="home__empty">No hay libros disponibles.</div>
+
+<div class="books-grid" *ngIf="!loading && books.length > 0">
+  <article
+    class="book-card"
+    *ngFor="let b of books"
+    [class.out-of-stock]="b.stock === 0"
+    (click)="openDetails(b)"
+    role="button"
+    tabindex="0"
+  >
+    <div *ngIf="b.stock === 0" class="out-overlay">Agotado</div>
+    <div class="book-card__media">
+      <img *ngIf="b.imageUrl" [src]="b.imageUrl" class="book-card__img" [alt]="b.name" />
+      <div *ngIf="!b.imageUrl" class="book-card__img book-card__img--placeholder"></div>
+    </div>
+    <div class="book-card__body">
+      <h3 class="book-card__title">{{ b.name }}</h3>
+      <div class="book-card__meta">Autor: {{ b.author.name || 'Desconocido' }}</div>
+      <div class="book-card__meta">Género: {{ (b.genres || [])[0]?.name || '—' }}</div>
+    </div>
+    <div class="book-card__footer">
+      <div class="book-card__price">${{ b.price ?? 0 }}</div>
+      <div class="book-card__stock">Stock: {{ b.stock }}</div>
+      <button
+        class="btn-primary"
+        type="button"
+        aria-label="Agregar al carrito"
+        title="Agregar al carrito"
+        (click)="addToCart(b.id); $event.stopPropagation()"
+        [disabled]="b.stock === 0"
+        [attr.title]="b.stock === 0 ? 'Agotado' : 'Agregar al carrito'"
+      >
+        <i class="ri-shopping-cart-fill"></i>
+      </button>
+    </div>
+  </article>
+</div>
+
+<div class="modal-backdrop" *ngIf="selectedBook" (click)="closeDetails()">
+  <div
+    class="modal-panel"
+    role="dialog"
+    aria-modal="true"
+    (click)="$event.stopPropagation()"
+    tabindex="-1"
+  >
+    <button class="modal-close" aria-label="Cerrar" (click)="closeDetails()">&times;</button>
+    <div class="modal-media">
+      <img *ngIf="selectedBook.imageUrl" [src]="selectedBook.imageUrl" [alt]="selectedBook.name" />
+      <div *ngIf="!selectedBook.imageUrl" class="modal-img-placeholder"></div>
+    </div>
+    <div class="modal-body">
+      <h2 class="modal-title">{{ selectedBook.name }}</h2>
+      <p class="modal-meta">Autor: {{ selectedBook.author.name || 'Desconocido' }}</p>
+      <p class="modal-meta">Género: {{ (selectedBook.genres || [])[0]?.name || '—' }}</p>
+      <p class="modal-desc">{{ selectedBook.description || 'Sin descripción.' }}</p>
+      <div class="modal-actions">
+        <div class="modal-price">${{ selectedBook.price ?? 0 }}</div>
+          <button class="btn-primary btn-comprar" type="button" (click)="addToCart(selectedBook.id)" [disabled]="selectedBook && selectedBook.stock === 0">
+            {{ (selectedBook && selectedBook.stock === 0) ? 'Agotado' : 'Comprar' }}
+          </button>
+      </div>
+    </div>
+  </div>
+</div>

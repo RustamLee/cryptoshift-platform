@@ -1,0 +1,19 @@
+:root{
+  --card-bg: var(--container-color);
+  --muted: var(--text-color);
+}
+.seller-sales .admin-header h2{ margin-bottom: 12px }
+.seller-sales .admin-container{ padding: 0 }
+.seller-sales .sales-list{ display:flex; flex-direction:column; gap:14px }
+.seller-sale-card{ background:var(--card-bg); border:1px solid var(--border-color); padding:10px; border-radius:10px; box-shadow: var(--header-shadow); }
+.seller-sale-grid{ display:grid; grid-template-columns: 220px 220px 1fr; gap:12px; align-items:start }
+.seller-sale-meta .order-number{ font-weight:700; font-size:1.05rem }
+.seller-sale-meta .order-date{ color:var(--muted); margin-top:6px }
+.seller-sale-meta .order-total{ margin-top:8px; font-weight:600 }
+.seller-sale-cardinfo{ color:var(--muted) }
+.seller-sale-items ul{ list-style:none; padding:0; margin:0 }
+.seller-sale-item{ display:grid; grid-template-columns: 1fr 56px 80px; gap:8px; padding:8px 0; border-bottom:1px dashed rgba(0,0,0,0.04) }
+.seller-sale-item:last-child{ border-bottom:none }
+.seller-item-name{ font-weight:600 }
+.seller-item-qty, .seller-item-sub{ color:var(--muted); text-align:right }
+@media (max-width:900px){ .seller-sale-grid{ grid-template-columns: 1fr; } .seller-sale-card{ padding:12px } }

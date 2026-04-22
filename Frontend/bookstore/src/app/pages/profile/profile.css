@@ -1,0 +1,259 @@
+:root {
+  --container-max: 1200px;
+}
+.profile-page {
+  margin-top: 20px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .profile-page{
+    margin-top: 20px;
+    padding: 16px;
+    gap: 30px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .menu-container {
+    min-width: 300px;
+    max-width: var(--container-max, 1200px);
+    margin: 0 auto;
+    box-sizing: border-box;
+    align-items: start;
+    border-right: 2px solid var(--header-border);
+    display: none;
+  }
+}
+
+.menu-container {
+  min-width: 300px;
+  max-width: var(--container-max, 1200px);
+  margin: 0 auto;
+  box-sizing: border-box;
+  align-items: start;
+  border-right: 2px solid var(--header-border);
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.profile-title h2 {
+  margin: 0;
+  text-align: center;
+  padding-bottom: 16px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.profile-side {
+  flex: 0 0 33.3333%;
+  padding: 16px;
+}
+
+.profile-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-menu__item {
+  color: var(--title-color);
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.profile-menu__item:hover {
+  background: var(--menu-item-hover);
+  color: var(--first-color);
+}
+.profile-menu__item.active {
+  background: var(--menu-item-hover);
+  font-weight: var(--font-semi-bold);
+  color: var(--first-color);
+}
+
+.profile-header__avatar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.avatar-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--first-color);
+  color: var(--white-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-semi-bold);
+}
+.profile-info {
+  text-align: left;
+}
+.profile-details {
+  max-width: 420px;
+}
+
+.profile-details .profile-role {
+  margin: 0;
+}
+
+.profile-email-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+.profile-email {
+  font-weight: var(--font-semi-bold);
+  margin-bottom: 8px;
+  margin-top: 5px;
+  flex: 0 0 auto;
+}
+.edit-email {
+  margin-left: 0;
+  background: transparent;
+  border: none;
+  color: var(--title-color);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  flex: 0 0 auto;
+}
+.edit-email:hover {
+  color: var(--first-color);
+}
+.profile-role {
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+.seller-detail-item {
+  margin: 8px 0;
+}
+
+.modal-field {
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+}
+.modal-field label {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+.modal-field input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.modal-field select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.modal-field input[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.field-hint {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+.field-hint.field-error {
+  color: #d9534f;
+}
+
+.edit-email {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  padding: 4px;
+}
+
+.edit-email:hover {
+  color: var(--first-color);
+}
+
+.seller-request-status {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.status-title {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 5px;
+  gap: 5px;
+}
+
+span.label {
+  font-weight: var(--font-semi-bold);
+}
+
+
+.status-pending {
+  color: #f59e0b;
+}
+
+.status-approved {
+  color: #16a34a;
+}
+
+.status-rejected {
+  color: #ef4444;
+}
+
+.status-message {
+  margin: 8px 0 12px;
+  font-size: 13px;
+}
+
+.rejection-reason {
+  margin: 8px 0;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+

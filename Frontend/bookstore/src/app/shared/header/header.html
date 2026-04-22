@@ -1,0 +1,129 @@
+<header class="header" id="header">
+  <div class="header__container">
+    <div class="nav__logo-container">
+    <a href="#" class="nav__logo"> <i class="ri-book-3-line"></i> Librería </a>
+    <a routerLink="/about" class="nav__link"><span>Sobre Nosotros</span></a>
+    </div>
+    <div class="nav__menu" id="nav-menu">
+      <ul class="nav__list">
+        <li class="nav__item nav__filters">
+          <div class="header-filters">
+            <div class="book-search">
+              <div class="book-wrapper">
+                <input class="book-input" placeholder="Buscar libro..." (input)="onBookInput($event)" (keyup.enter)="onBookSearch()" />
+                <button type="button" class="book-btn" (click)="onBookSearch()" aria-label="Buscar">
+                  <i class="ri-search-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-genres" aria-label="Filtros por género">
+              <div class="genres-menu" #genresMenu [class.open]="genresOpen">
+                <button class="genres-toggler genres-area" (click)="toggleGenresMenu($event)" type="button" [attr.aria-expanded]="genresOpen">
+                  <div class="genres-meta">
+                    <div class="genres-name">Géneros</div>
+                  </div>
+
+                  <i class="ri-arrow-down-s-line chevron" aria-hidden="true"></i>
+                </button>
+
+                <div class="genres-menu__dropdown">
+                  <div class="genres-arrow" aria-hidden="true"></div>
+                  <div class="genres-list">
+                    <label *ngFor="let g of genres" class="genre-item">
+                      <input type="checkbox" (change)="onToggleGenre(g.id, $event)" [checked]="selectedGenresHas(g.id)" />
+                      <span>{{ g.name }}</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-author" aria-label="Filtro por autor">
+              <div class="author-meta">
+                <div class="author-name">Autor</div>
+              </div>
+              <div class="author-wrapper" #authorBox>
+                <input class="author-input" placeholder="Buscar autor..." [value]="authorQuery" (input)="onAuthorInput($event)" (focus)="showAuthorSuggestions=true" />
+
+                <div class="author-suggestions" *ngIf="showAuthorSuggestions && filteredAuthors().length">
+                  <div class="suggestion-arrow" aria-hidden="true"></div>
+                  <ul>
+                    <li *ngFor="let a of filteredAuthors()" (mousedown)="selectAuthor(a)">{{ a.name }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav__actions">
+      <button class="nav__toggle theme-toggle" (click)="toggleTheme()" aria-label="Toggle theme">
+        <i [class]="isDark ? 'ri-sun-line' : 'ri-moon-line'"></i>
+      </button>
+      @if (auth.userSignal()) {
+      <div class="user-menu" #userMenu role="menu" [class.open]="menuOpen">
+        <div class="user-area" (click)="toggleUserMenu($event)">
+          <div class="user-badge" title="{{ auth.userSignal()!.name }}">
+            {{ getInitials(auth.userSignal()!.name) }}
+          </div>
+
+          <div class="user-meta">
+            <div class="user-name">
+              {{ getLocalPart(auth.userSignal()!.email || auth.userSignal()!.name) }}
+            </div>
+            <i class="ri-arrow-down-s-line chevron" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <div class="user-menu__dropdown">
+          <ul class="user-menu__list">
+            <li
+              class="user-menu__item user-menu__item--profile"
+              [routerLink]="profileRoute"
+              (click)="debugProfileClick($event)"
+            >
+              <div class="profile-avatar" aria-hidden="true">
+                {{ getInitials(auth.userSignal()!.name) }}
+              </div>
+              <div class="profile-meta">
+                <div class="profile-name">{{ auth.userSignal()!.name }}</div>
+                <div class="profile-sub">
+                  Mi perfil<i class="ri-arrow-right-s-line chevron"></i>
+                </div>
+              </div>
+            </li>
+            @if (isAdmin) {
+            <li class="user-menu__item" (click)="onAdminGenresClick()">Gestión de Géneros</li>
+            <li class="user-menu__item" (click)="onAdminAuthorsClick()">Gestión de Autores</li>
+            <li class="user-menu__item" (click)="onAdminSellerRequestsClick()">Solicitudes de vendedores</li>
+            } @else if (!isSellerRoute) {
+            <li class="user-menu__item" (click)="onCardsClick()">Mis tarjetas</li>
+            <li class="user-menu__item" (click)="onPurchasesClick()">Mis compras</li>
+            <li class="user-menu__item" (click)="onSellClick()">Vender</li>
+            } @else {
+            <li class="user-menu__item" (click)="onSellerSalesClick()">Mis ventas</li>
+            <li class="user-menu__item" (click)="onSellerCatalogClick()">Mi catalogo</li>
+            <li class="user-menu__item" (click)="onHeaderToggle()">{{ toggleLabel }}</li>
+            }
+            <li class="user-menu__item" (click)="logout()">Salir</li>
+          </ul>
+        </div>
+
+        @if(!isAdmin && !isSellerActive){
+          <button class="user-cart" (click)="onCartClick()">
+              <i class="ri-shopping-cart-2-line"></i>
+              <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+            </button>
+        }
+
+      </div>
+      } @else {
+      <a routerLink="/register" class="nav__link">Creá tu cuenta</a>
+      <a routerLink="/login" class="nav__link">Ingresá</a>
+      }
+    </div>
+  </div>
+</header>

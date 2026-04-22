@@ -1,0 +1,131 @@
+<section class="seller-requests-content">
+  <header class="section-header">
+    <h2>Solicitudes de Vendedores</h2>
+  </header>
+
+  <div class="requests-container">
+    <ng-container *ngIf="isLoading">
+      <div class="loading-message">Cargando solicitudes...</div>
+    </ng-container>
+    <ng-container *ngIf="!isLoading">
+      <ng-container *ngIf="requests.length === 0">
+        <div class="empty-message">No hay solicitudes de vendedores</div>
+      </ng-container>
+      <ng-container *ngIf="requests.length > 0">
+        <ng-template #statusTpl let-row>
+          <i [ngClass]="[getStatusIconClass(row.status), getStatusClass(row.status), 'status-icon']"></i>
+        </ng-template>
+
+        <app-profile-table
+          [columns]="columns"
+          [keys]="keys"
+          [rows]="requests"
+          [actionsTemplate]="actionsTpl"
+          [cellTemplates]="{ status: statusTpl }"
+        ></app-profile-table>
+
+        <ng-template #actionsTpl let-row>
+          <div class="actions">
+            <button
+              class="btn-primary btn-sm"
+              (click)="processRequest(row)"
+            >
+              <span *ngIf="row.status === 'PENDING'">Procesar</span>
+              <span *ngIf="row.status !== 'PENDING'">Ver</span>
+            </button>
+          </div>
+        </ng-template>
+
+        <ng-container *ngIf="showProcessModal && selectedRequest">
+          <div class="modal" (click)="showProcessModal = false; showRejectModal = false">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+              <button class="modal-close" aria-label="Cerrar" (click)="showProcessModal = false">×</button>
+              <h3>Solicitud: {{ selectedRequest.businessName }}</h3>
+
+              <div class="detail-section">
+                <div class="detail-row">
+                  <span class="label">Usuario:</span>
+                  <span class="value">{{ selectedRequest.userName }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">CUIT:</span>
+                  <span class="value">{{ selectedRequest.cuit }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Dirección:</span>
+                  <span class="value">{{ selectedRequest.address }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Fecha:</span>
+                  <span class="value">{{ selectedRequest.createdDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                                <div class="detail-row">
+                                  <span class="label">Estado:</span>
+                                  <span [ngClass]="getStatusClass(selectedRequest.status)">{{ getStatusLabel(selectedRequest.status) }}</span>
+                                </div>
+                <div *ngIf="selectedRequest.rejectionReason" class="detail-row">
+                  <span class="label">Motivo del rechazo:</span>
+                  <span class="value rejection">{{ selectedRequest.rejectionReason }}</span>
+                </div>
+              </div>
+
+              <div class="modal-actions">
+                <ng-container *ngIf="selectedRequest.status === 'PENDING'">
+                  <button class="btn-primary" (click)="approveRequest()" [disabled]="!canApprove() || isProcessing">
+                    <span *ngIf="isProcessing">Procesando...</span>
+                    <span *ngIf="!isProcessing">Aprobar</span>
+                  </button>
+                  <button class="btn-danger" (click)="openRejectModal()" [disabled]="!canReject() || isProcessing">Rechazar</button>
+                </ng-container>
+
+                <ng-container *ngIf="selectedRequest.status !== 'PENDING'">
+                  <button class="btn-secondary" (click)="showProcessModal = false">Cerrar</button>
+                </ng-container>
+              </div>
+
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <ng-container *ngIf="showRejectModal">
+    <div class="modal" (click)="closeRejectModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="modal-close" aria-label="Cerrar" (click)="closeRejectModal()">×</button>
+        <h3>Rechazar solicitud</h3>
+
+        <div class="modal-field">
+          <label for="rejectReason">Motivo del rechazo</label>
+          <textarea
+            id="rejectReason"
+            name="rejectReason"
+            [(ngModel)]="rejectionReason"
+            [disabled]="isProcessing"
+            placeholder="Explique brevemente el motivo del rechazo..."
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button
+            class="btn-danger"
+            (click)="submitReject()"
+            [disabled]="isProcessing || !rejectionReason.trim()"
+          >
+            <span *ngIf="isProcessing">Procesando...</span>
+            <span *ngIf="!isProcessing">Rechazar</span>
+          </button>
+          <button
+            class="btn-secondary"
+            (click)="closeRejectModal()"
+            [disabled]="isProcessing"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</section>

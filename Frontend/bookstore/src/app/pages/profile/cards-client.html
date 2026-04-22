@@ -1,0 +1,116 @@
+<section class="admin-page">
+  <header class="admin-header">
+    <h2>Mis tarjetas</h2>
+    <div class="admin-actions">
+      <button class="btn-primary" (click)="openAdd()">Agregar tarjeta</button>
+    </div>
+  </header>
+
+  <div class="admin-container">
+    <app-profile-table
+      [columns]="columns"
+      [keys]="keys"
+      [rows]="cards"
+      [actionsTemplate]="cardActions"
+    ></app-profile-table>
+
+    <ng-template #cardActions let-row>
+      <button class="btn-small" title="Editar" (click)="openEdit(row)">
+        <i class="ri-edit-line"></i>
+      </button>
+      <button class="btn-small danger" title="Eliminar" (click)="deleteCard(row)">
+        <i class="ri-delete-bin-5-line"></i>
+      </button>
+    </ng-template>
+  </div>
+</section>
+
+@if (showModal) {
+<div class="modal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" aria-label="Cerrar" (click)="closeModal()">×</button>
+    <h3>@if(editing) {Editar tarjeta} @else {Agregar tarjeta}</h3>
+
+    <div class="modal-field">
+      <label for="cardNumber">Número de tarjeta</label>
+      <input
+        id="cardNumber"
+        name="cardNumber"
+        maxlength="19"
+        inputmode="numeric"
+        autocomplete="cc-number"
+        [(ngModel)]="cardNumber"
+        (beforeinput)="onBeforeInputCard($event)"
+        (input)="onCardNumberInput($event)"
+        (keydown)="allowDigitKeydown($event)"
+        (paste)="onPasteCardNumber($event)"
+        (blur)="onBlur('card')"
+        (focus)="onFocus('card')"
+      />
+      <div class="field-hint">Formato: 1234 5678 9012 3456</div>
+      @if (cardTouched && !(isCardNumberValid((cardNumber || '').replace(/\D/g, '')))) {
+      <div class="field-error">Número inválido — debe tener exactamente 16 dígitos.</div>
+      }
+    </div>
+
+    <div class="modal-field">
+      <label for="bank">Banco</label>
+      <input
+        id="bank"
+        name="bank"
+        [(ngModel)]="bank"
+        (input)="onInput('bank')"
+        (blur)="onBlur('bank')"
+        (focus)="onFocus('bank')"
+      />
+      @if (bankTouched && !isBankValid(bank)) {
+      <div class="field-error">Nombre del banco inválido — debe tener entre 3 y 25 caracteres.</div>
+      }
+    </div>
+
+    <div class="modal-field">
+      <label for="cvv">CVV</label>
+      <input
+        id="cvv"
+        name="cvv"
+        maxlength="3"
+        inputmode="numeric"
+        autocomplete="cc-csc"
+        [(ngModel)]="cvv"
+        (beforeinput)="onBeforeInputCvv($event)"
+        (input)="onCvvInput($event)"
+        (keydown)="allowDigitKeydown($event)"
+        (paste)="onPasteCvv($event)"
+        (blur)="onBlur('cvv')"
+        (focus)="onFocus('cvv')"
+      />
+      @if (cvvTouched && !isCvvValid(cvv)) {
+      <div class="field-error">CVV inválido — debe tener exactamente 3 dígitos.</div>
+      }
+    </div>
+
+    @if (error) {
+    <div class="error">{{ error }}</div>
+    }
+
+    <div class="modal-actions">
+      <button class="btn-primary" (click)="submit()" [disabled]="isSaving || !formValid()">
+        <span *ngIf="isSaving" class="spinner" aria-hidden="true"></span> Guardar
+      </button>
+      <button class="btn-secondary" (click)="closeModal()" [disabled]="isSaving">Cancelar</button>
+    </div>
+  </div>
+</div>
+} @if (showDeleteModal) {
+<app-confirm-dialog
+  [visible]="showDeleteModal"
+  [title]="'Confirmar eliminación'"
+  [message]="deleteMessage"
+  [errorMessage]="deleteError"
+  [confirmLabel]="'Eliminar'"
+  [cancelLabel]="'Cancelar'"
+  [loading]="deleting"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-dialog>
+}

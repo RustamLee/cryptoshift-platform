@@ -1,0 +1,110 @@
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.admin-container {
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.admin-container > *,
+.admin-container .author-table,
+.admin-container app-profile-table,
+.admin-container .profile-table {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.table-container {
+  padding: 20px;
+  flex: 1 1 auto;
+  min-height: 0;
+  box-sizing: border-box;
+  height: 400px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+.actions {
+  width: 1px;
+  white-space: nowrap;
+  text-align: right;
+  padding-right: 8px;
+}
+
+.col-actions {
+  width: 1px;
+}
+
+table td:first-child,
+table th:first-child {
+  width: 50%;
+}
+table td:nth-child(2),
+table th:nth-child(2) {
+  width: auto;
+}
+table td:nth-child(3),
+table th:nth-child(3) {
+  min-width: 9ch;
+  white-space: nowrap;
+}
+.btn-small {
+  margin-right: 8px;
+}
+.btn-small:not(.danger) {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  padding: 4px;
+  border-radius: 6px;
+}
+.btn-small:not(.danger):hover {
+  color: var(--first-color);
+}
+.btn-small.danger {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  padding: 4px;
+  border-radius: 6px;
+}
+.btn-small.danger:hover {
+  color: var(--danger-color, #f44336);
+}
+.empty {
+  padding: 16px;
+  color: #666;
+}
+
+:host-context(.seller-requests-content) table th:nth-child(4),
+:host-context(.seller-requests-content) table td:nth-child(4) {
+  text-align: center;
+  vertical-align: middle;
+}
+
+:host-context(.seller-requests-content) table td:nth-child(4) .status-icon {
+  display: inline-block;
+  margin: 0 auto;
+}

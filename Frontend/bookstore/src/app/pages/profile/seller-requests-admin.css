@@ -1,0 +1,76 @@
+.confirm-error {
+  margin-top: 0.75rem;
+  color: #c62828;
+}
+.processing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.5rem 0 1rem 0;
+}
+.processing-text {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.modal-content .btn-primary,
+.modal-content .btn-secondary,
+.modal-content .btn-danger {
+  padding: 0.75rem 1rem;
+  min-width: 140px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: var(--font-semi-bold);
+  font-size: var(--normal-font-size);
+  cursor: pointer;
+}
+
+.modal-content .btn-primary {
+  background: var(--first-color);
+  color: var(--white-color);
+  border: none;
+}
+
+.modal-content .btn-secondary {
+  background: transparent;
+  border: 1px solid #ccc;
+  color: var(--text-color);
+}
+
+.modal-content .btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+}
+
+.status-icon {
+  font-size: 1.15rem;
+  vertical-align: middle;
+}
+
+.seller-requests-content .profile-table table th:nth-child(4),
+.seller-requests-content .profile-table table td:nth-child(4) {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.seller-requests-content .profile-table table td:nth-child(4) .status-icon {
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.seller-requests-content .modal-field textarea,
+.modal-content .modal-field textarea {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-color);
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 80px;
+  resize: vertical;
+}

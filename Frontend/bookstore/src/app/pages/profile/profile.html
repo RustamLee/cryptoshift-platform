@@ -1,0 +1,54 @@
+<section class="profile-content">
+  <header class="profile-title">
+    <h2>Perfil del Cliente</h2>
+  </header>
+  <div class="profile-header">
+    <div class="profile-header__avatar">
+      <div class="avatar-circle">{{ (user()?.name || '').slice(0, 2).toUpperCase() }}</div>
+      <div class="profile-info">
+        <div class="profile-email">{{ user()?.email || user()?.name }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-details">
+    @if (user() as user) {
+    <p class="profile-email"><strong>Email:</strong> {{ user.email || user.name }}</p>
+    <p class="profile-role">
+      <strong>Rol:</strong>
+      @if ((user.roles || []).length) {
+      <span *ngFor="let r of user.roles; let last = last">
+        {{ roleLabel(r) }}@if (!last) {<span>, </span>}
+      </span>
+      } @else { — }
+    </p>
+    }
+  </div>
+</section>
+
+@if (showSellerModal) {
+<div class="modal" (click)="showSellerModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" aria-label="Cerrar" (click)="showSellerModal = false">×</button>
+    <h3>Registro como vendedor</h3>
+    <div class="modal-field">
+      <label for="sellerName">El nombre de empresa</label>
+      <input id="sellerName" name="sellerName" [(ngModel)]="sellerName" required />
+    </div>
+    <div class="modal-field">
+      <label for="sellerAddress">La direccion</label>
+      <input id="sellerAddress" name="sellerAddress" [(ngModel)]="sellerAddress" required />
+    </div>
+    <div class="modal-actions">
+      <button
+        class="btn-primary"
+        (click)="submitSellerRegistration()"
+        [disabled]="!sellerName.trim() || !sellerAddress.trim()"
+      >
+        Continuar
+      </button>
+      <button class="btn-secondary" (click)="showSellerModal = false">Cancelar</button>
+    </div>
+  </div>
+</div>
+}

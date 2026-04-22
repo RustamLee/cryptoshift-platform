@@ -1,0 +1,81 @@
+<section class="admin-page">
+  <header class="admin-header">
+    <h2>Gestión de Autores</h2>
+    <div class="admin-actions">
+      <button class="btn-primary" (click)="openCreateModal()">Crear</button>
+    </div>
+  </header>
+
+  <div class="admin-container">
+    <app-profile-table
+      [columns]="['Nombre', 'Fecha de nacimiento']"
+      [keys]="['name', 'birthDate']"
+      [rows]="authors"
+      [actionsTemplate]="authorActions"
+    ></app-profile-table>
+    <ng-template #authorActions let-row>
+      <button class="btn-small" title="Editar" (click)="openEditModal(row)">
+        <i class="ri-edit-line"></i>
+      </button>
+      <button class="btn-small danger" title="Eliminar" (click)="deleteGenre(row)">
+        <i class="ri-delete-bin-5-line"></i>
+      </button>
+    </ng-template>
+  </div>
+</section>
+
+@if (showCreateModal) {
+<div class="modal" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" aria-label="Cerrar" (click)="closeCreateModal()">×</button>
+    @if (isEditMode) {
+    <h3>Editar Autor</h3>
+    } @else {
+    <h3>Crear Autor</h3>
+    }
+    <div class="modal-field">
+      <label for="authorName">Nombre</label>
+      <input id="authorName" name="authorName" [(ngModel)]="newAuthorName" />
+    </div>
+    <div class="modal-field">
+      <label for="newAuthorBirthDate">Fecha de nacimiento (requerida)</label>
+      <input
+        id="newAuthorBirthDate"
+        name="newAuthorBirthDate"
+        type="date"
+        required
+        max="{{ newAuthorMaxDate }}"
+        [(ngModel)]="newAuthorBirthDate"
+      />
+    </div>
+    @if (createError) {
+    <div class="error">{{ createError }}</div>
+    }
+    <div class="modal-actions">
+      <button
+        class="btn-primary"
+        (click)="submitCreateOrEdit()"
+        [disabled]="creating || !newAuthorName.trim() || !newAuthorBirthDate"
+      >
+        @if (creating) {<span class="spinner" aria-hidden="true"></span>} @if (isEditMode) {Guardar}
+        @else {Crear}
+      </button>
+      <button class="btn-secondary" (click)="closeCreateModal()" [disabled]="creating">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+} @if (showDeleteModal) {
+<app-confirm-dialog
+  [visible]="showDeleteModal"
+  [title]="'Confirmar eliminación'"
+  [message]="deleteMessage"
+  [errorMessage]="deleteError"
+  [confirmLabel]="'Eliminar'"
+  [cancelLabel]="'Cancelar'"
+  [loading]="deleting"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-dialog>
+}

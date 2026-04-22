@@ -1,0 +1,103 @@
+
+<header>
+    <h1>Mi carrito</h1>
+    <p *ngIf="!paymentMode">Libros en el carrito:</p>
+    <p *ngIf="paymentMode">Elegí la forma de pago</p>
+</header>
+
+<main>
+    <div class="profile-page" *ngIf="!loading && cartItems.length > 0">
+        <aside class="menu-container">
+            <div class="profile-content">
+                <div class="profile-title"><h2>Detalle del pedido</h2></div>
+                <div class="order-list">
+                    <div class="order-row" *ngFor="let s of getSummary()">
+                        <div class="order-name">{{ s.book.name }}</div>
+                        <div class="order-qty">x{{ s.quantity }}</div>
+                        <div class="order-subtotal">${{ s.subtotal }}</div>
+                    </div>
+                </div>
+
+                <div class="order-total">
+                    <div class="order-total-label">Total:</div>
+                    <div class="order-total-value">${{ getTotalPrice() }}</div>
+                </div>
+
+                <div class="order-actions">
+                    <button *ngIf="!paymentMode" class="btn-primary" (click)="onStartPayment()">Pagar</button>
+                </div>
+            </div>
+        </aside>
+
+        <section class="profile-content">
+            <div *ngIf="!paymentMode" class="cart-items">
+                <article class="cart-item" *ngFor="let s of getSummary()">
+                    <div class="cart-item__media">
+                        <img *ngIf="s.book.imageUrl" [src]="s.book.imageUrl" [alt]="s.book.name" />
+                        <div *ngIf="!s.book.imageUrl" class="book-card__img--placeholder"></div>
+                    </div>
+                    <div class="cart-item__info">
+                        <div class="cart-item__title">{{ s.book.name }}</div>
+                        <div class="cart-item__author">{{ s.book.author.name || 'Desconocido' }}</div>
+                    </div>
+                    <div class="cart-item__controls">
+                        <div class="qty-wrap">
+                            <button class="qty-btn" (click)="substractItemFromCart(s.book.id)">-</button>
+                            <div class="qty-value">{{ s.quantity }}</div>
+                            <button
+                                class="qty-btn"
+                                (click)="addItemToCart(s.book.id)"
+                                [disabled]="s.book && s.book.stock != null && s.quantity >= s.book.stock"
+                                [attr.title]="(s.book && s.book.stock != null && s.quantity >= s.book.stock) ? 'Sin stock disponible' : 'Agregar'">
+                                +
+                            </button>
+                        </div>
+                        <div *ngIf="s.book && s.book.stock != null && s.quantity >= s.book.stock" class="no-disponible">Agotado</div>
+                    </div>
+                    <div class="cart-item__subtotal">${{ s.subtotal }}</div>
+                </article>
+            </div>
+
+            <div *ngIf="paymentMode && userCards.length > 0" class="cards-list">
+                <article class="cart-item card-pay" *ngFor="let c of userCards" [class.selected]="selectedCardId === c.id">
+                    <div class="card-select">
+                        <input type="checkbox" [checked]="selectedCardId === c.id" (change)="onSelectCard(c.id)" />
+                    </div>
+                    <div class="card-number">**** {{ c.cardNumber.slice(-4) }}</div>
+                    <div class="card-bank">Banco: {{ c.bank }}</div>
+                </article>
+
+                <div class="cards-actions modal-actions">
+                    <button class="btn-secondary" (click)="onCancelPayment()">Cancelar</button>
+                    <button class="btn-primary" [disabled]="!selectedCardId" (click)="onConfirmPayment()">Pagar</button>
+                </div>
+            </div>
+            <div *ngIf="paymentMode && userCards.length === 0" class="no-cards">
+                <div class="empty-message">No tenés tarjetas guardadas para pagar.</div>
+                <div class="empty-actions modal-actions">
+                    <button class="btn-primary" (click)="onAddCard()">Agregar tarjeta</button>
+                    <button class="btn-secondary" (click)="onCancelPayment()">Cancelar</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+        <div *ngIf="!loading && cartItems.length === 0" class="home__empty">
+            <div>No hay items en el carrito actualmente.</div>
+            <div class="empty-actions">
+                <button class="btn-primary shop-btn" (click)="goToShop()">Ver Productos</button>
+            </div>
+        </div>
+</main>
+
+<app-confirm-dialog
+    [visible]="confirmVisible"
+    [title]="confirmTitle"
+    [message]="confirmMessage"
+    [confirmLabel]="'Pagar'"
+    [cancelLabel]="'Cancelar'"
+    [loading]="confirmLoading"
+    [errorMessage]="confirmError"
+    (confirm)="onDialogConfirm()"
+    (cancel)="onDialogCancel()"
+></app-confirm-dialog>
