@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-import { BookDTO } from  './book.service';
+import { BookDTO } from './book.service';
 
 @Injectable({ providedIn: 'root'})
 export class CartService {

@@ -1,4 +1,4 @@
-import { CardService } from './../../services/card.service';
+import { CardService } from '../../services/card.service';
 import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
 import { BookDTO} from '../../services/book.service';
 import { CartService } from '../../services/cart.service';

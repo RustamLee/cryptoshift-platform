@@ -6,55 +6,55 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="about-page">
-      <div class="about-inner">
-        <main class="about-card">
-          <header class="about-header">
-            <div class="about-title">
-              Librería E. Commerce
-              <div class="about-logo-wrap">
-                <picture>
-                  <source srcset="/UTN-iso-new.png" />
-                  <img src="/UTN-iso-new.png" alt="UTN MDP" class="about-logo" />
-                </picture>
-              </div>
-            </div>
-          </header>
-          <div class="about-body">
-            <p class="about-text">
-              El proyecto llamado “API Librería E.Commerce” se encargará de mantener un registro de
-              los libros, los usuarios y toda la información relacionada a las compras realizadas
-              por medio del sistema. También permitirá la búsqueda y clasificación de libros junto
-              con la realización de ABM de usuario, géneros de libros y perfiles vendedores por
-              parte de los administradores. Es importante destacar que el sistema no lleva registros
-              de los envíos o pagos realizados, ya que el manejo de estos quedarán relegados a APIs
-              externas.
-            </p>
+      <section class="about-page">
+          <div class="about-inner">
+              <main class="about-card">
+                  <header class="about-header">
+                      <div class="about-title">
+                          Librería E. Commerce
+                          <div class="about-logo-wrap">
+                              <picture>
+                                  <source srcset="/UTN-iso-new.png"/>
+                                  <img src="/UTN-iso-new.png" alt="UTN MDP" class="about-logo"/>
+                              </picture>
+                          </div>
+                      </div>
+                  </header>
+                  <div class="about-body">
+                      <p class="about-text">
+                          El proyecto llamado “API Librería E.Commerce” se encargará de mantener un registro de
+                          los libros, los usuarios y toda la información relacionada a las compras realizadas
+                          por medio del sistema. También permitirá la búsqueda y clasificación de libros junto
+                          con la realización de ABM de usuario, géneros de libros y perfiles vendedores por
+                          parte de los administradores. Es importante destacar que el sistema no lleva registros
+                          de los envíos o pagos realizados, ya que el manejo de estos quedarán relegados a APIs
+                          externas.
+                      </p>
 
-            <div class="about-authors">
-              <h3>Carrera:</h3>
-              <p>Tecnicatura Universitaria en Programación</p>
-            </div>
+                      <div class="about-authors">
+                          <h3>Carrera:</h3>
+                          <p>Tecnicatura Universitaria en Programación</p>
+                      </div>
 
-            <div class="about-authors">
-              <h3>Materia:</h3>
-              <p>Programación IV</p>
-            </div>
+                      <div class="about-authors">
+                          <h3>Materia:</h3>
+                          <p>Programación IV</p>
+                      </div>
 
-            <div class="about-authors">
-              <h3>Profesor:</h3>
-              <p>Gabriel Chaldu</p>
-            </div>
+                      <div class="about-authors">
+                          <h3>Profesor:</h3>
+                          <p>Gabriel Chaldu</p>
+                      </div>
 
-            <div class="about-authors">
-              <h3>Integrantes:</h3>
-              <p>Ezequiel Rodríguez Reding · Sebastián Roldán · Rustam Sagaddinov</p>
-              <p>2025</p>
-            </div>
+                      <div class="about-authors">
+                          <h3>Integrantes:</h3>
+                          <p>Ezequiel Rodríguez Reding · Sebastián Roldán · Rustam Sagaddinov</p>
+                          <p>2025</p>
+                      </div>
+                  </div>
+              </main>
           </div>
-        </main>
-      </div>
-    </section>
+      </section>
   `,
   styles: [
     `
