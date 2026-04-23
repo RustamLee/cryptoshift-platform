@@ -146,11 +146,6 @@ public class BookControler {
         }
     }
 
-    @GetMapping("/statistics/averageprice")
-    public ResponseEntity<Double> getAveragePrice(){
-        return ResponseEntity.ok(bookService.calculateAveragePrice());
-    }
-
     @GetMapping("/statistics/books-per-author")
     public ResponseEntity<Map<String, Long>> getBooksPerAuthor(){
         return ResponseEntity.ok(bookService.countBooksPerAuthor());

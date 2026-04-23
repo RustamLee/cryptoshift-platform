@@ -51,7 +51,7 @@ CREATE TABLE books (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    price DOUBLE NOT NULL,
+    price DECIMAL NOT NULL,
     stock INT NOT NULL,
     author_id BIGINT,
     seller_id BIGINT,

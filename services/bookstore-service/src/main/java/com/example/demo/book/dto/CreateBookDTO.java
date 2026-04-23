@@ -6,6 +6,8 @@ import com.example.demo.sellerprofile.model.SellerProfile;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
@@ -21,7 +23,7 @@ public class CreateBookDTO {
 
     @NotNull(message = "El precio no puede ser nulo")
     @Min(value = 0, message = "El precio no puede ser un valor negativo")
-    private Double price;
+    private BigDecimal price;
 
     @NotNull(message = "El stock no puede ser nulo")
     @Min(value = 0, message = "El stock no puede ser un valor negativo")
@@ -33,7 +35,7 @@ public class CreateBookDTO {
     private Set<Genre> genres;
     private SellerProfile seller;
 
-    public CreateBookDTO(String name, String description, Double price, Long stock, Author author, Set<Genre> genres, SellerProfile seller) {
+    public CreateBookDTO(String name, String description, BigDecimal price, Long stock, Author author, Set<Genre> genres, SellerProfile seller) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -54,11 +56,11 @@ public class CreateBookDTO {
     public CreateBookDTO() {
     }
 
-    public @NotNull(message = "El nombre no puede ser nulo") @Size(min = 1, max = 255, message = "El nombre del libro debe tener entre 1 y 255 caracteres") String getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(@NotNull(message = "El nombre no puede ser nulo") @Size(min = 1, max = 255, message = "El nombre del libro debe tener entre 1 y 255 caracteres") String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -70,27 +72,27 @@ public class CreateBookDTO {
         this.description = description;
     }
 
-    public @NotNull(message = "El precio no puede ser nulo") @Min(value = 0, message = "El precio no puede ser un valor negativo") Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(@NotNull(message = "El precio no puede ser nulo") @Min(value = 0, message = "El precio no puede ser un valor negativo") Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public @NotNull(message = "El stock no puede ser nulo") @Min(value = 0, message = "El stock no puede ser un valor negativo") Long getStock() {
+    public Long getStock() {
         return stock;
     }
 
-    public void setStock(@NotNull(message = "El stock no puede ser nulo") @Min(value = 0, message = "El stock no puede ser un valor negativo") Long stock) {
+    public void setStock (Long stock) {
         this.stock = stock;
     }
 
-    public @NotNull(message = "El autor no puede ser nulo") Author getAuthor() {
+    public Author getAuthor() {
         return author;
     }
 
-    public void setAuthor(@NotNull(message = "El autor no puede ser nulo") Author author) {
+    public void setAuthor(Author author) {
         this.author = author;
     }
 
@@ -117,13 +119,15 @@ public class CreateBookDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateBookDTO that = (CreateBookDTO) o;
-        return Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price)
+        boolean priceEquals = (price == null && that.price == null) || (price != null && price.compareTo(that.price) == 0);
+        return Objects.equals(name, that.name) && Objects.equals(description, that.description) && priceEquals
                 && Objects.equals(stock, that.stock) && Objects.equals(author, that.author) && Objects.equals(genres, that.genres) && Objects.equals(seller, that.seller);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, price, stock, author, genres,seller);
+        Object priceForHash = (price != null) ? price.stripTrailingZeros() : null;
+        return Objects.hash(name, description, priceForHash, stock, author, genres, seller);
     }
 
     @Override

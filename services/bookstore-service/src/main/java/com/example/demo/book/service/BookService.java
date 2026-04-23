@@ -19,7 +19,6 @@ public interface BookService {
     BookDTO createBook(CreateBookDTO createBookDTO) throws AlreadyExistingException, NotFoundException;
     Optional<BookDTO> updateBook (Long id, UpdateBookDTO updateBookDTO) throws UnautorizedException;
     boolean deleteBook(Long id) throws UnautorizedException;
-    double calculateAveragePrice ();
     Map<String, Long> countBooksPerAuthor();
     List<BookDTOReduced> getByAuthor(Long id) throws NotFoundException;
     List<BookDTOReduced> getByGenre(Long id) throws NotFoundException;

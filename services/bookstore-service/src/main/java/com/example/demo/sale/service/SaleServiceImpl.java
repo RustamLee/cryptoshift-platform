@@ -11,6 +11,7 @@ import com.example.demo.sale.dto.CreateSaleDTO;
 import com.example.demo.sale.dto.SaleDTO;
 import com.example.demo.sale.dto.UpdateSaleDTO;
 import com.example.demo.sale.model.Sale;
+import com.example.demo.sale.model.SaleStatus;
 import com.example.demo.sale.repository.SaleRepository;
 import com.example.demo.user.model.User;
 import com.example.demo.user.service.UserServiceImpl;
@@ -25,6 +26,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Date;
@@ -85,29 +87,15 @@ public class SaleServiceImpl implements SaleService{
         if(card.isPresent() && user.getCards().contains(card.get())){
             List<Book> cart = new ArrayList<>(user.getCart());
 
-            Sale newSale = new Sale(Date.valueOf(LocalDate.now()),user,card.get(),cart);
+            Sale newSale = new Sale(Date.valueOf(LocalDate.now()),user,card.get(),cart, SaleStatus.PENDING);
             Sale savedSale = repository.save(newSale);
             bookService.updateStock(user.getCart());
 
             userService.emptyCart();
 
-            double total = 0;
-            for(Book book : savedSale.getBooks()){
-                total += book.getPrice();
-            }
-
-            String template = Files.readString(Paths.get("src/main/resources/templates/email-de-compra-exitosa.html"));
-
-            String booksList = savedSale.getBooks().stream()
-                    .map(book -> "<li>" + book.getName() + " - $" + book.getPrice() + "</li>")
-                    .collect(Collectors.joining());
-
-            String htmlDetails = template
-                    .replace("{{orderId}}", String.valueOf(savedSale.getId()))
-                    .replace("{{total}}", String.valueOf(total))
-                    .replace("{{books}}", booksList);
-
-            sendSaleEmail(user.getName(), htmlDetails);
+            BigDecimal total = savedSale.getBooks().stream()
+                    .map(Book::getPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             return convertToDTO(savedSale);
         }else {
             throw new NotFoundException("La tarjeta no esta registrada");
@@ -175,12 +163,36 @@ public class SaleServiceImpl implements SaleService{
 
     @Override
     public Sale convertToEntity(CreateSaleDTO createSaleDTO) {
-        return new Sale(createSaleDTO.getDate(),createSaleDTO.getUser(),createSaleDTO.getCard(),createSaleDTO.getBooks());
+        return new Sale(createSaleDTO.getDate(),createSaleDTO.getUser(),createSaleDTO.getCard(),createSaleDTO.getBooks(), SaleStatus.PENDING);
     }
 
     @Override
     public SaleDTO convertToDTO(Sale sale) {
         return new SaleDTO(sale.getId(),sale.getDate(),userService.convertToDTO(sale.getUser()),cardService.reduceCard(sale.getCard()),sale.getBooks().stream().map(bookService::reduceBook).collect(Collectors.toList()));
+    }
+
+    public SaleDTO confirmSale(Long saleId) throws NotFoundException, IOException {
+        Sale sale = repository.findById(saleId)
+                .orElseThrow(() -> new NotFoundException("Sale not found"));
+
+        if (sale.getStatus() == SaleStatus.PAID) {
+            return convertToDTO(sale);
+        }
+
+        sale.setStatus(SaleStatus.PAID);
+        Sale savedSale = repository.save(sale);
+
+        BigDecimal total = savedSale.getBooks().stream()
+                .map(Book::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        sendSaleEmail(sale.getUser().getName(), "<h1>Gracias por su compra</h1><p>Detalles de la compra:</p><ul>" +
+                savedSale.getBooks().stream()
+                        .map(book -> "<li>" + book.getName() + " - $" + book.getPrice() + "</li>")
+                        .collect(Collectors.joining()) +
+                "</ul><p>Total: $" + total.toPlainString() + "</p>");
+
+        return convertToDTO(savedSale);
     }
 
 

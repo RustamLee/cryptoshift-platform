@@ -7,6 +7,7 @@ import com.example.demo.sellerprofile.model.SellerProfile;
 import com.example.demo.user.model.User;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class Book {
     private String description;
 
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal price;
 
     @Column(nullable = false)
     private Long stock;
@@ -57,7 +58,7 @@ public class Book {
     @ManyToMany(mappedBy = "cart")
     private List<User> cartUser;
 
-    public Book(Long id, String name, String description, Double price, Long stock, Author author,
+    public Book(Long id, String name, String description, BigDecimal price, Long stock, Author author,
                 Set<Genre> genres, List<Sale> sales, SellerProfile seller, List<User> cartUser) {
         this.id = id;
         this.name = name;
@@ -71,7 +72,7 @@ public class Book {
         this.cartUser = cartUser;
     }
 
-    public Book(String name, String description, Double price, Long stock, Author author, Set<Genre> genres,
+    public Book(String name, String description, BigDecimal price, Long stock, Author author, Set<Genre> genres,
                 List<Sale> sales, SellerProfile seller, List<User> cartUser) {
         this.name = name;
         this.description = description;
@@ -84,7 +85,7 @@ public class Book {
         this.cartUser = cartUser;
     }
 
-    public Book(String name, String description, Double price, Long stock, Author author,
+    public Book(String name, String description, BigDecimal price, Long stock, Author author,
                 Set<Genre> genres, SellerProfile seller) {
         this.name = name;
         this.description = description;
@@ -138,11 +139,11 @@ public class Book {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -197,14 +198,14 @@ public class Book {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Book)) return false;
         Book book = (Book) o;
-        return Objects.equals(name, book.name) && Objects.equals(description, book.description) && Objects.equals(author, book.author) && Objects.equals(genres, book.genres);
+        return id != null && id.equals(book.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, price, author);
+        return getClass().hashCode();
     }
 
     @Override
@@ -215,8 +216,6 @@ public class Book {
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", stock=" + stock +
-                ", author=" + author +
-                ", genres=" + genres +
                 '}';
     }
 }

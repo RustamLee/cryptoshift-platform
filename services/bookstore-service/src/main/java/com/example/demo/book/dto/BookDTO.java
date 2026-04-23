@@ -3,6 +3,8 @@ package com.example.demo.book.dto;
 import com.example.demo.author.dto.AuthorDTOReduced;
 import com.example.demo.genre.dto.GenreDTO;
 import com.example.demo.sellerprofile.dto.SellerProfileDTO;
+
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
@@ -11,14 +13,14 @@ public class BookDTO {
     private Long id;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private Long stock;
     private AuthorDTOReduced author;
     private Set<GenreDTO> genres;
     private SellerProfileDTO seller;
     private String imageUrl;
 
-    public BookDTO(Long id, String name, String description, Double price, Long stock, AuthorDTOReduced author,
+    public BookDTO(Long id, String name, String description, BigDecimal price, Long stock, AuthorDTOReduced author,
                    Set<GenreDTO> genres, SellerProfileDTO seller) {
         this.id = id;
         this.name = name;
@@ -30,7 +32,7 @@ public class BookDTO {
         this.seller = seller;
     }
 
-    public BookDTO(Long id, String name, String description, Double price, Long stock, AuthorDTOReduced author,
+    public BookDTO(Long id, String name, String description, BigDecimal price, Long stock, AuthorDTOReduced author,
                    Set<GenreDTO> genres, String imageUrl, SellerProfileDTO seller) {
         this.id = id;
         this.name = name;
@@ -43,7 +45,7 @@ public class BookDTO {
         this.seller = seller;
     }
 
-    public BookDTO(String name, String description, Double price, Long stock, AuthorDTOReduced author,
+    public BookDTO(String name, String description, BigDecimal price, Long stock, AuthorDTOReduced author,
                    Set<GenreDTO> genres, SellerProfileDTO seller) {
         this.name = name;
         this.description = description;
@@ -81,11 +83,11 @@ public class BookDTO {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

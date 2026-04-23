@@ -111,13 +111,6 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public double calculateAveragePrice() {
-        return repository.findAll().stream()
-                .mapToDouble(Book::getPrice)
-                .average().orElse(0.0);
-    }
-
-    @Override
     public Map<String, Long> countBooksPerAuthor() {
         return repository.findAll().stream()
                 .collect(Collectors.groupingBy(book -> book.getAuthor().getName(),
@@ -230,14 +223,17 @@ public class BookServiceImpl implements BookService{
         return new BookDTOReduced(book.getId(), book.getName(), book.getDescription(), book.getPrice(), book.getStock(), reduceAuthor(book.getAuthor()), genres, book.getImageUrl());
     }
 
-    
     public List<BookDTO> getBooksByFilter(Optional<UUID> genreId, Optional<UUID> authorId) {
-        Specification<Book> spec = Specification.where(BookSpecification.hasGenre(genreId))
-                .and(BookSpecification.hasAuthor(authorId));
+        Specification<Book> spec = Specification.allOf(
+                BookSpecification.hasGenre(genreId),
+                BookSpecification.hasAuthor(authorId)
+        );
 
         System.out.println("Specification: " + spec);
 
-        return repository.findAll(spec).stream().map(this::convertToDTO).toList();
+        return repository.findAll(spec).stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
 

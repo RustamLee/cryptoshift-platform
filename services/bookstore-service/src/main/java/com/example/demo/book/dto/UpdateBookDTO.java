@@ -4,6 +4,8 @@ import com.example.demo.author.model.Author;
 import com.example.demo.genre.model.Genre;
 import com.example.demo.sellerprofile.model.SellerProfile;
 import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,8 +17,8 @@ public class UpdateBookDTO {
 
     private String imageUrl;
 
-    @Min(value = 0, message = "El precio no puede ser un valor negativo")
-    private Double price;
+    @DecimalMin(value = "0.0", message = "El precio no puede ser un valor negativo")
+    private BigDecimal price;
 
     @Min(value = 0, message = "El stock no puede ser un valor negativo")
     private Long stock;
@@ -26,7 +28,7 @@ public class UpdateBookDTO {
     private Set<Genre> genres;
     private SellerProfile seller;
 
-    public UpdateBookDTO(String name, String description, Double price, Long stock, Author author, Set<Genre> genres, SellerProfile seller) {
+    public UpdateBookDTO(String name, String description, BigDecimal price, Long stock, Author author, Set<Genre> genres, SellerProfile seller) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -47,11 +49,11 @@ public class UpdateBookDTO {
     public UpdateBookDTO() {
     }
 
-    public @Size(min = 1, max = 255, message = "El nombre del libro debe tener entre 1 y 255 caracteres") String getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(@Size(min = 1, max = 255, message = "El nombre del libro debe tener entre 1 y 255 caracteres") String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -63,27 +65,27 @@ public class UpdateBookDTO {
         this.description = description;
     }
 
-    public @Min(value = 0, message = "El precio no puede ser un valor negativo") Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(@Min(value = 0, message = "El precio no puede ser un valor negativo") Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public @Min(value = 0, message = "El stock no puede ser un valor negativo") Long getStock() {
+    public Long getStock() {
         return stock;
     }
 
-    public void setStock(@Min(value = 0, message = "El stock no puede ser un valor negativo") Long stock) {
+    public void setStock(Long stock) {
         this.stock = stock;
     }
 
-    public @NotNull(message = "El autor no puede ser nulo") Author getAuthor() {
+    public Author getAuthor() {
         return author;
     }
 
-    public void setAuthor(@NotNull(message = "El autor no puede ser nulo") Author author) {
+    public void setAuthor (Author author) {
         this.author = author;
     }
 
@@ -110,14 +112,17 @@ public class UpdateBookDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UpdateBookDTO that = (UpdateBookDTO) o;
-        return  Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price) &&
+
+        boolean priceEquals = (price == null && that.price == null) || (price != null && price.compareTo(that.price) == 0);
+        return Objects.equals(name, that.name) && Objects.equals(description, that.description) && priceEquals &&
                 Objects.equals(stock, that.stock) && Objects.equals(author, that.author) && Objects.equals(genres, that.genres) &&
                 Objects.equals(seller, that.seller);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, price, stock, author, genres, seller);
+        Object priceForHash = (price != null) ? price.stripTrailingZeros() : null;
+        return Objects.hash(name, description, priceForHash, stock, author, genres, seller);
     }
 
     @Override

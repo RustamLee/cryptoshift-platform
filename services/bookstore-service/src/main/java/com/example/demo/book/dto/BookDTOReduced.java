@@ -2,13 +2,15 @@ package com.example.demo.book.dto;
 
 import com.example.demo.author.dto.AuthorDTOReduced;
 import com.example.demo.genre.dto.GenreDTO;
+
+import java.math.BigDecimal;
 import java.util.Set;
 
 public class BookDTOReduced {
     private Long id;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private Long stock;
     private AuthorDTOReduced author;
     private Set<GenreDTO> genres;
@@ -20,7 +22,7 @@ public class BookDTOReduced {
         this.description = description;
     }
 
-    public BookDTOReduced(Long id, String name, String description, Double price, Long stock) {
+    public BookDTOReduced(Long id, String name, String description, BigDecimal price, Long stock) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -28,7 +30,7 @@ public class BookDTOReduced {
         this.stock = stock;
     }
 
-    public BookDTOReduced(Long id, String name, String description, Double price, Long stock, AuthorDTOReduced author) {
+    public BookDTOReduced(Long id, String name, String description, BigDecimal price, Long stock, AuthorDTOReduced author) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -37,7 +39,7 @@ public class BookDTOReduced {
         this.author = author;
     }
 
-    public BookDTOReduced(Long id, String name, String description, Double price, Long stock, AuthorDTOReduced author, String imageUrl) {
+    public BookDTOReduced(Long id, String name, String description, BigDecimal price, Long stock, AuthorDTOReduced author, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -47,7 +49,7 @@ public class BookDTOReduced {
         this.imageUrl = imageUrl;
     }
 
-    public BookDTOReduced(Long id, String name, String description, Double price, Long stock, AuthorDTOReduced author, Set<GenreDTO> genres, String imageUrl) {
+    public BookDTOReduced(Long id, String name, String description, BigDecimal price, Long stock, AuthorDTOReduced author, Set<GenreDTO> genres, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -63,14 +65,14 @@ public class BookDTOReduced {
         this.description = description;
     }
 
-    public BookDTOReduced(String name, String description, Double price, Long stock) {
+    public BookDTOReduced(String name, String description, BigDecimal price, Long stock) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stock = stock;
     }
 
-    public BookDTOReduced(String name, String description, Double price, Long stock, AuthorDTOReduced author) {
+    public BookDTOReduced(String name, String description, BigDecimal price, Long stock, AuthorDTOReduced author) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -102,11 +104,11 @@ public class BookDTOReduced {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

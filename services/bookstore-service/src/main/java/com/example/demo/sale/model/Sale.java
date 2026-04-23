@@ -36,19 +36,25 @@ public class Sale {
     )
     private List<Book> books;
 
-    public Sale(Long id, Date date, User user, Card card, List<Book> books) {
+    @Enumerated(EnumType.STRING)
+    private SaleStatus status = SaleStatus.PENDING;
+
+
+    public Sale(Long id, Date date, User user, Card card, List<Book> books, SaleStatus status) {
         this.id = id;
         this.date = date;
         this.user = user;
         this.card = card;
         this.books = books;
+        this.status = status;
     }
 
-    public Sale(Date date, User user, Card card, List<Book> books) {
+    public Sale(Date date, User user, Card card, List<Book> books, SaleStatus status) {
         this.date = date;
         this.user = user;
         this.card = card;
         this.books = books;
+        this.status = status;
     }
 
     public Sale() {
@@ -94,17 +100,25 @@ public class Sale {
         this.books = books;
     }
 
+    public SaleStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SaleStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sale sale = (Sale) o;
-        return Objects.equals(date, sale.date) && Objects.equals(user, sale.user) && Objects.equals(card, sale.card) && Objects.equals(books, sale.books);
+        return Objects.equals(date, sale.date) && Objects.equals(user, sale.user) && Objects.equals(card, sale.card) && Objects.equals(books, sale.books) && status == sale.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, user, card, books);
+        return Objects.hash(id, date, user, card, books, status);
     }
 
     @Override
@@ -115,6 +129,7 @@ public class Sale {
                 ", user=" + user +
                 ", card=" + card +
                 ", books=" + books +
+                ", status=" + status +
                 '}';
     }
 }
