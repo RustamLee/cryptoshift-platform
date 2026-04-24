@@ -1,0 +1,16 @@
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: cryptoshift-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=bookstore_db,orchestrator_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/db/init:/docker-entrypoint-initdb.d
+
+volumes:
+  postgres_data:
