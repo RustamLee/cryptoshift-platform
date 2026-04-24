@@ -1,11 +1,11 @@
-package com.example.demo.sale.repository;
+package com.example.demo.order.repository;
 
-import com.example.demo.sale.model.Sale;
+import com.example.demo.order.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SaleRepository extends JpaRepository<Sale,Long> {
+public interface OrderRepository extends JpaRepository<Order,Long> {
 	boolean existsByUser_Id(Long userId);
 
 	boolean existsByBooks_Seller_Id(Long sellerId);

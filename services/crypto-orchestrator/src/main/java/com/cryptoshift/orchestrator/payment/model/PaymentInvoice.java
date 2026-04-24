@@ -2,6 +2,7 @@ package com.cryptoshift.orchestrator.payment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -12,10 +13,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "payment_invoice")
 public class PaymentInvoice {
 
     @Id
-    @GeneratedValue(generator = "UUID")
+    @UuidGenerator
     private UUID id;
     private Long orderId;
     private BigDecimal amountUsd;

@@ -5,6 +5,7 @@ CREATE TABLE users (
                        password               VARCHAR(255) NOT NULL,
                        status                 VARCHAR(50) DEFAULT 'ACTIVE',
                        is_temporary_password  BOOLEAN DEFAULT FALSE
+);
 
 
 
@@ -42,15 +43,16 @@ CREATE TABLE cards (
                        CONSTRAINT fk_card_owner FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
-CREATE TABLE sales
+CREATE TABLE orders
 (
     id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     date    DATE NOT NULL,
     user_id BIGINT,
     card_id BIGINT,
+    total_price DECIMAL(19, 2) NOT NULL,
     status  VARCHAR(50) DEFAULT 'PENDING',
-    CONSTRAINT fk_sale_user FOREIGN KEY (user_id) REFERENCES users (id),
-    CONSTRAINT fk_sale_card FOREIGN KEY (card_id) REFERENCES cards (id)
+    CONSTRAINT fk_order_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_order_card FOREIGN KEY (card_id) REFERENCES cards (id)
 );
 
 
@@ -81,13 +83,13 @@ CREATE TABLE books_genres
     CONSTRAINT fk_bg_genre FOREIGN KEY (genre_id) REFERENCES genres (id)
 );
 
-CREATE TABLE sales_books
+CREATE TABLE orders_books
 (
     book_id BIGINT,
-    sale_id BIGINT,
-    PRIMARY KEY (book_id, sale_id),
+    order_id BIGINT,
+    PRIMARY KEY (book_id, order_id),
     CONSTRAINT fk_sb_book FOREIGN KEY (book_id) REFERENCES books (id),
-    CONSTRAINT fk_sb_sale FOREIGN KEY (sale_id) REFERENCES sales (id)
+    CONSTRAINT fk_sb_order FOREIGN KEY (order_id) REFERENCES orders (id)
 );
 
 CREATE TABLE user_roles

@@ -1,6 +1,6 @@
 package com.example.demo.cards.model;
 
-import com.example.demo.sale.model.Sale;
+import com.example.demo.order.model.Order;
 import com.example.demo.user.model.User;
 import jakarta.persistence.*;
 
@@ -28,15 +28,15 @@ public class Card {
     private User owner;
 
     @OneToMany(mappedBy = "card")
-    private List<Sale> sales;
+    private List<Order> orders;
 
-    public Card(Long id, String cardNumber, String bank, String cvv, User owner, List<Sale> sales) {
+    public Card(Long id, String cardNumber, String bank, String cvv, User owner, List<Order> orders) {
         this.id = id;
         this.cardNumber = cardNumber;
         this.bank = bank;
         this.cvv = cvv;
         this.owner = owner;
-        this.sales = sales;
+        this.orders = orders;
     }
 
     public Card(String cardNumber, String bank, String cvv, User owner) {
@@ -89,12 +89,12 @@ public class Card {
         this.owner = owner;
     }
 
-    public List<Sale> getSales() {
-        return sales;
+    public List<Order> getOrders() {
+        return orders;
     }
 
-    public void setSales(List<Sale> sales) {
-        this.sales = sales;
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     @Override
@@ -102,12 +102,12 @@ public class Card {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Card card = (Card) o;
-        return Objects.equals(cardNumber, card.cardNumber) && Objects.equals(bank, card.bank) && Objects.equals(cvv, card.cvv) && Objects.equals(owner, card.owner) && Objects.equals(sales, card.sales);
+        return Objects.equals(cardNumber, card.cardNumber) && Objects.equals(bank, card.bank) && Objects.equals(cvv, card.cvv) && Objects.equals(owner, card.owner) && Objects.equals(orders, card.orders);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, cardNumber, bank, cvv, owner, sales);
+        return Objects.hash(id, cardNumber, bank, cvv, owner, orders);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class Card {
                 ", Bank='" + bank + '\'' +
                 ", cvv='" + cvv + '\'' +
                 ", owner=" + owner +
-                ", sales=" + sales +
+                ", sales=" + orders +
                 '}';
     }
 }

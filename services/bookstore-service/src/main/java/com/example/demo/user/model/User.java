@@ -2,7 +2,7 @@ package com.example.demo.user.model;
 
 import com.example.demo.book.model.Book;
 import com.example.demo.cards.model.Card;
-import com.example.demo.sale.model.Sale;
+import com.example.demo.order.model.Order;
 import com.example.demo.sellerprofile.model.SellerProfile;
 import jakarta.persistence.*;
 
@@ -35,7 +35,7 @@ public class User {
     private List<Book> cart;
 
     @OneToMany(mappedBy = "user")
-    private List<Sale> sales;
+    private List<Order> orders;
 
     @OneToOne(mappedBy = "sellerUser")
     private SellerProfile sellerProfile;
@@ -48,21 +48,21 @@ public class User {
     @Column(name = "role")
     private Set<String> roles = new HashSet<>();
 
-    public User(Long id, String name, String password, List<Book> cart, List<Sale> sales, SellerProfile sellerProfile, List<Card> cards) {
+    public User(Long id, String name, String password, List<Book> cart, List<Order> orders, SellerProfile sellerProfile, List<Card> cards) {
         this.id = id;
         this.name = name;
         this.password = password;
         this.cart = cart;
-        this.sales = sales;
+        this.orders = orders;
         this.sellerProfile = sellerProfile;
         this.cards = cards;
     }
 
-    public User(String name, String password, List<Book> cart, List<Sale> sales, SellerProfile sellerProfile, List<Card> cards) {
+    public User(String name, String password, List<Book> cart, List<Order> orders, SellerProfile sellerProfile, List<Card> cards) {
         this.name = name;
         this.password = password;
         this.cart = cart;
-        this.sales = sales;
+        this.orders = orders;
         this.sellerProfile = sellerProfile;
         this.cards = cards;
     }
@@ -108,12 +108,12 @@ public class User {
         this.cart = cart;
     }
 
-    public List<Sale> getSales() {
-        return sales;
+    public List<Order> getOrders() {
+        return orders;
     }
 
-    public void setSales(List<Sale> sales) {
-        this.sales = sales;
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     public SellerProfile getSellerProfile() {
@@ -178,7 +178,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
                 ", cart=" + cart +
-                ", sales=" + sales +
+                ", orders=" + orders +
                 ", sellerProfile=" + sellerProfile +
                 ", cards=" + cards +
                 '}';

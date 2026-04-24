@@ -2,14 +2,13 @@ package com.example.demo.book.model;
 
 import com.example.demo.author.model.Author;
 import com.example.demo.genre.model.Genre;
-import com.example.demo.sale.model.Sale;
+import com.example.demo.order.model.Order;
 import com.example.demo.sellerprofile.model.SellerProfile;
 import com.example.demo.user.model.User;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -43,7 +42,7 @@ public class Book {
     private Set<Genre> genres;
 
     @ManyToMany(mappedBy = "books")
-    private List<Sale> sales;
+    private List<Order> orders;
 
     @ManyToOne
     @JoinColumn(name = "seller_id")
@@ -59,7 +58,7 @@ public class Book {
     private List<User> cartUser;
 
     public Book(Long id, String name, String description, BigDecimal price, Long stock, Author author,
-                Set<Genre> genres, List<Sale> sales, SellerProfile seller, List<User> cartUser) {
+                Set<Genre> genres, List<Order> orders, SellerProfile seller, List<User> cartUser) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -67,20 +66,20 @@ public class Book {
         this.stock = stock;
         this.author = author;
         this.genres = genres;
-        this.sales = sales;
+        this.orders = orders;
         this.seller = seller;
         this.cartUser = cartUser;
     }
 
     public Book(String name, String description, BigDecimal price, Long stock, Author author, Set<Genre> genres,
-                List<Sale> sales, SellerProfile seller, List<User> cartUser) {
+                List<Order> orders, SellerProfile seller, List<User> cartUser) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stock = stock;
         this.author = author;
         this.genres = genres;
-        this.sales = sales;
+        this.orders = orders;
         this.seller = seller;
         this.cartUser = cartUser;
     }
@@ -171,12 +170,12 @@ public class Book {
         this.genres = genres;
     }
 
-    public List<Sale> getSales() {
-        return sales;
+    public List<Order> getOrders() {
+        return orders;
     }
 
-    public void setSales(List<Sale> sales) {
-        this.sales = sales;
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     public SellerProfile getSeller() {

@@ -1,10 +1,10 @@
-package com.example.demo.sale.controler;
+package com.example.demo.order.controler;
 
 import com.example.demo.exceptions.InsufficientStockException;
 import com.example.demo.exceptions.NotFoundException;
-import com.example.demo.sale.dto.SaleDTO;
-import com.example.demo.sale.dto.UpdateSaleDTO;
-import com.example.demo.sale.service.SaleServiceImpl;
+import com.example.demo.order.dto.OrderDTO;
+import com.example.demo.order.dto.UpdateOrderDTO;
+import com.example.demo.order.service.OrderServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,31 +15,31 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sales")
-public class SaleControler {
+public class OrderControler {
 
-    private final SaleServiceImpl saleService;
+    private final OrderServiceImpl orderService;
 
-    public SaleControler(SaleServiceImpl saleService) {
-        this.saleService = saleService;
+    public OrderControler(OrderServiceImpl orderService) {
+        this.orderService = orderService;
     }
 
     @GetMapping
-    public ResponseEntity<List<SaleDTO>> getAllSales () {
-        List<SaleDTO> sales = saleService.getAll();
+    public ResponseEntity<List<OrderDTO>> getAllSales () {
+        List<OrderDTO> sales = orderService.getAll();
         return ResponseEntity.ok(sales);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SaleDTO> getSaleById (@PathVariable Long id) {
-        Optional<SaleDTO> sale = saleService.getById(id);
+    public ResponseEntity<OrderDTO> getSaleById (@PathVariable Long id) {
+        Optional<OrderDTO> sale = orderService.getById(id);
         return sale.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<SaleDTO> createSale(@RequestBody Long id){
+    public ResponseEntity<OrderDTO> createSale(@RequestBody Long id){
         try {
-            SaleDTO saleDTO = saleService.createSale(id);
-            return new ResponseEntity<>(saleDTO, HttpStatus.CREATED);
+            OrderDTO orderDTO = orderService.createOrder(id);
+            return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (InsufficientStockException | IOException e) {
@@ -49,15 +49,15 @@ public class SaleControler {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SaleDTO> updateSale(@PathVariable Long id, @RequestBody UpdateSaleDTO updateSaleDTO){
-        Optional<SaleDTO> updatedSale = saleService.updateSale(id, updateSaleDTO);
+    public ResponseEntity<OrderDTO> updateSale(@PathVariable Long id, @RequestBody UpdateOrderDTO updateOrderDTO){
+        Optional<OrderDTO> updatedSale = orderService.updateOrder(id, updateOrderDTO);
         return updatedSale.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id){
-        boolean deleted = saleService.deleteSale(id);
+        boolean deleted = orderService.deleteOrder(id);
         if (deleted){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }else{

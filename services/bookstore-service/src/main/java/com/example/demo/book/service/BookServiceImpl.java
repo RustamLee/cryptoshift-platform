@@ -171,8 +171,8 @@ public class BookServiceImpl implements BookService{
             }
             book.setStock(book.getStock() - (int) quantity);
 
-            if (book.getSales() == null) {
-                book.setSales(new ArrayList<>());
+            if (book.getOrders() == null) {
+                book.setOrders(new ArrayList<>());
             }
 
             repository.save(book);

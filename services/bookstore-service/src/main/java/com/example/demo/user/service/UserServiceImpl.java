@@ -2,6 +2,7 @@ package com.example.demo.user.service;
 import com.example.demo.configuration.CurrentUserUtils;
 import com.example.demo.exceptions.AlreadyExistingException;
 import com.example.demo.exceptions.NotFoundException;
+import com.example.demo.order.repository.OrderRepository;
 import com.example.demo.user.dto.CreateUserDTO;
 import com.example.demo.user.dto.UpdateUserDTO;
 import com.example.demo.user.dto.UserDTO;
@@ -30,19 +31,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final com.example.demo.sellerprofile.repository.SellerProfileRepository sellerProfileRepository;
     private final com.example.demo.cards.repository.CardsRepository cardsRepository;
-    private final com.example.demo.sale.repository.SaleRepository saleRepository;
+    private final OrderRepository orderRepository;
     private final com.example.demo.book.repository.BookRepository bookRepository;
 
     public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder,
                            com.example.demo.sellerprofile.repository.SellerProfileRepository sellerProfileRepository,
                            com.example.demo.cards.repository.CardsRepository cardsRepository,
-                           com.example.demo.sale.repository.SaleRepository saleRepository,
+                           OrderRepository orderRepository,
                            com.example.demo.book.repository.BookRepository bookRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.sellerProfileRepository = sellerProfileRepository;
         this.cardsRepository = cardsRepository;
-        this.saleRepository = saleRepository;
+        this.orderRepository = orderRepository;
         this.bookRepository = bookRepository;
     }
 
@@ -102,8 +103,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         try {
-            boolean hasSales = saleRepository.existsByUser_Id(id);
-            if (hasSales) {
+            boolean hasOrders = orderRepository.existsByUser_Id(id);
+            if (hasOrders) {
                 User u = target.get();
                 u.setStatus("INACTIVE");
                 repository.save(u);
@@ -114,8 +115,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             if (t.getSellerProfile() != null) {
                 Long sellerId = t.getSellerProfile().getId();
                 boolean sellerHasBooks = bookRepository.existsBySeller_Id(sellerId);
-                boolean sellerHasSales = saleRepository.existsByBooks_Seller_Id(sellerId);
-                if (sellerHasBooks || sellerHasSales) {
+                boolean sellerHasOrders = orderRepository.existsByBooks_Seller_Id(sellerId);
+                if (sellerHasBooks || sellerHasOrders) {
                     t.setStatus("INACTIVE");
                     repository.save(t);
                     var books = bookRepository.findBySeller_Id(sellerId);
@@ -143,11 +144,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 }
             }
 
-            var sales = saleRepository.findAll();
-            for (var s : sales) {
+            var orders = orderRepository.findAll();
+            for (var s : orders) {
                 if (s.getUser() != null && s.getUser().getId() != null && s.getUser().getId().equals(id)) {
                     s.setUser(null);
-                    saleRepository.save(s);
+                    orderRepository.save(s);
                 }
             }
 
@@ -244,15 +245,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new NotFoundException("Usuario no encontrado");
         }
 
-        boolean hasSales = saleRepository.existsByUser_Id(id);
-        if (hasSales) return false;
+        boolean hasOrders = orderRepository.existsByUser_Id(id);
+        if (hasOrders) return false;
 
         User t = target.get();
         if (t.getSellerProfile() != null) {
             Long sellerId = t.getSellerProfile().getId();
             boolean sellerHasBooks = bookRepository.existsBySeller_Id(sellerId);
-            boolean sellerHasSales = saleRepository.existsByBooks_Seller_Id(sellerId);
-            if (sellerHasBooks || sellerHasSales) {
+            boolean sellerHasOrders = orderRepository.existsByBooks_Seller_Id(sellerId);
+            if (sellerHasBooks || sellerHasOrders) {
                 return false;
             }
         }
