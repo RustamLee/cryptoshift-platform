@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/sales")
+@RequestMapping("/api/orders")
 public class OrderControler {
 
     private final OrderServiceImpl orderService;
@@ -24,19 +24,19 @@ public class OrderControler {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderDTO>> getAllSales () {
+    public ResponseEntity<List<OrderDTO>> getAllOrders () {
         List<OrderDTO> sales = orderService.getAll();
         return ResponseEntity.ok(sales);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDTO> getSaleById (@PathVariable Long id) {
+    public ResponseEntity<OrderDTO> getOrderById (@PathVariable Long id) {
         Optional<OrderDTO> sale = orderService.getById(id);
         return sale.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<OrderDTO> createSale(@RequestBody Long id){
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody Long id){
         try {
             OrderDTO orderDTO = orderService.createOrder(id);
             return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);

@@ -12,7 +12,7 @@ export interface SaleDTO {
 
 @Injectable({ providedIn: 'root' })
 export class SaleService {
-  private base = '/api/sales';
+  private base = '/api/orders';
 
   constructor(private http: HttpClient) {}
 

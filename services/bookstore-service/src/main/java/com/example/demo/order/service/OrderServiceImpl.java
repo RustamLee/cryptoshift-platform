@@ -86,10 +86,18 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO createOrder(Long cardId) throws NotFoundException, InsufficientStockException, IOException {
         User user = userService.getCurrentUser();
+        List<Book> cart = new ArrayList<>(user.getCart());
+
+        if(cart.isEmpty()){
+            throw new IllegalStateException("Cannot сreate order with an empty cart");
+        }
+
         Optional<Card> card = cardService.getByIdNumber(cardId);
 
         if (card.isPresent() && user.getCards().contains(card.get())) {
-            List<Book> cart = new ArrayList<>(user.getCart());
+
+            cart.forEach(b -> org.slf4j.LoggerFactory.getLogger(OrderServiceImpl.class)
+                    .info("Book in cart: ID={}, Name={}, Price={}", b.getId(), b.getName(), b.getPrice()));
 
             BigDecimal total = cart.stream()
                     .map(Book::getPrice)
@@ -118,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
 
             return convertToDTO(savedOrder);
         } else {
-            throw new NotFoundException("La tarjeta no esta registrada");
+            throw new NotFoundException("Card not found or does not belong to user");
         }
     }
 
@@ -162,7 +170,7 @@ public class OrderServiceImpl implements OrderService {
         Email addressee = new Email(userEmail);
         Content details = new Content("text/html", htmlDetails);
 
-        Mail mail = new Mail(sender, "Compra realizada", addressee, details);
+        Mail mail = new Mail(sender, "Order created:", addressee, details);
 
         SendGrid sg = new SendGrid(emailApiKey);
         Request request = new Request();

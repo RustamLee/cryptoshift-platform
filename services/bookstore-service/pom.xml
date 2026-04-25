@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.4.2</version>
 		<relativePath/> 
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>bookstore-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>APi Libreria E.Commerce</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Bookstore service</description>
 	<url/>
 	<licenses>
 		<license/>
