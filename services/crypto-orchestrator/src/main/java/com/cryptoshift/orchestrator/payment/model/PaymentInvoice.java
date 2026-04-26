@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,4 +27,7 @@ public class PaymentInvoice {
     private String cryptoAddress;
     @Enumerated(EnumType.STRING)
     private PaymentState state;
+    private LocalDateTime createdAt;
+    private LocalDateTime expiresAt;
+    private BigDecimal lockedRate;
 }

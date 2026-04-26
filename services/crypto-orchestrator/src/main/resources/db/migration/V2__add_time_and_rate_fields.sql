@@ -1,0 +1,4 @@
+ALTER TABLE payment_invoice
+    ADD COLUMN locked_rate NUMERIC(19, 8),
+    ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN expires_at TIMESTAMP;

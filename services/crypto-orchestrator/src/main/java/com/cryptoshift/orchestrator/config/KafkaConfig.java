@@ -10,7 +10,6 @@ public class KafkaConfig {
 
     @Bean
     public RecordMessageConverter converter() {
-        // Этот бин говорит Спрингу: "Если видишь JSON — конвертируй в объект сам"
         return new JsonMessageConverter();
     }
 }
