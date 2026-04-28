@@ -27,7 +27,7 @@ public class GenreServiceImpl implements GenreService{
     @Override
     public GenreDTO createGenre(CreateGenreDTO createGenreDTO) throws AlreadyExistingException {
         Genre newGenre = convertToEntity(createGenreDTO);
-        if (repository.findAll().contains(newGenre)){
+        if (repository.findByName(newGenre.getName()).isPresent()){
             throw new AlreadyExistingException("El genreo ya existe");
         }
         Genre savedGenre = repository.save(newGenre);
@@ -80,7 +80,10 @@ public class GenreServiceImpl implements GenreService{
 
     @Override
     public Genre convertToEntity(CreateGenreDTO createGenreDTO) {
-        return new Genre(createGenreDTO.getName(), createGenreDTO.getDescription());
+        return Genre.builder()
+                .name(createGenreDTO.getName())
+                .description(createGenreDTO.getDescription())
+                .build();
     }
 
     @Override

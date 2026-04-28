@@ -1,7 +1,7 @@
 package com.example.demo.sellerrequest.dto;
 
 import com.example.demo.sellerrequest.model.SellerRequest;
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 public class SellerRequestDTO {
     private Long id;
@@ -12,8 +12,8 @@ public class SellerRequestDTO {
     private String address;
     private String status;
     private String rejectionReason;
-    private Date createdDate;
-    private Date updatedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 
     public SellerRequestDTO() {
     }
@@ -96,19 +96,19 @@ public class SellerRequestDTO {
         this.rejectionReason = rejectionReason;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Date getUpdatedDate() {
+    public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
+    public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
 }

@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -104,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             Order newOrder = Order.builder()
-                    .date(Date.valueOf(LocalDate.now()))
+                    .date(LocalDateTime.now())
                     .user(user)
                     .card(card.get())
                     .books(cart)

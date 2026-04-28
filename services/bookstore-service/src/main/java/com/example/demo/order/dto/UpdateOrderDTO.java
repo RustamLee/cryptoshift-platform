@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ import java.util.Objects;
 @Builder
 public class UpdateOrderDTO {
 
-    private Date date;
+    private LocalDateTime date;
     private User user;
     private Card card;
     private List<Book> books;

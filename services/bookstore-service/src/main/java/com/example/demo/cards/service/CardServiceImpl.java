@@ -117,7 +117,12 @@ public class CardServiceImpl implements CardService{
 
     @Override
     public Card convertToEntity(CreateCardDTO createCardDTO) {
-        return new Card(createCardDTO.getCardNumber(),createCardDTO.getBank(), createCardDTO.getCvv(),createCardDTO.getOwner());
+        return Card.builder()
+                .cardNumber(createCardDTO.getCardNumber())
+                .bank(createCardDTO.getBank())
+                .cvv(createCardDTO.getCvv())
+                .owner(createCardDTO.getOwner())
+                .build();
     }
 
     @Override

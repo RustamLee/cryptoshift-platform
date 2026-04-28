@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,7 +21,7 @@ import java.util.Objects;
 public class OrderDTO {
 
     private Long id;
-    private Date date;
+    private LocalDateTime date;
     private UserDTO user;
     private ReducedCardDTO card;
     private List<BookDTOReduced> books;

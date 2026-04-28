@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ import java.util.Objects;
 public class CreateOrderDTO {
 
     @NotNull(message = "The date of order cannot be null")
-    private Date date;
+    private LocalDateTime date;
     @NotNull(message = "The linked client can't be null")
     private User user;
     @NotNull(message = "The linked card can't be null")

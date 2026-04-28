@@ -10,8 +10,7 @@ import com.example.demo.sellerprofile.model.SellerProfile;
 import com.example.demo.sellerprofile.repository.SellerProfileRepository;
 import org.springframework.stereotype.Service;
 import com.example.demo.exceptions.NotFoundException;
-import java.sql.Date;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +41,13 @@ public class SellerRequestService {
             throw new RuntimeException("You already have a pending seller request");
         }
 
-        SellerRequest request = new SellerRequest(currentUser, dto.getBusinessName(), dto.getCuit(), dto.getAddress());
+        SellerRequest request = SellerRequest.builder()
+                .user(currentUser)
+                .businessName(dto.getBusinessName())
+                .cuit(dto.getCuit())
+                .address(dto.getAddress())
+                .createdDate(LocalDateTime.now())
+                .build();
         SellerRequest saved = repository.save(request);
         return new SellerRequestDTO(saved);
     }
@@ -85,7 +90,12 @@ public class SellerRequestService {
         if (user != null) {
             boolean changed = false;
             if (user.getSellerProfile() == null) {
-                SellerProfile newSeller = new SellerProfile(request.getBusinessName(), request.getAddress(), request.getCuit(), user);
+                SellerProfile newSeller = SellerProfile.builder()
+                        .name(request.getBusinessName())
+                        .address(request.getAddress())
+                        .afipNumber(request.getCuit())
+                        .sellerUser(user)
+                        .build();
                 SellerProfile savedSeller = sellerProfileRepository.save(newSeller);
                 user.setSellerProfile(savedSeller);
                 changed = true;
@@ -104,7 +114,7 @@ public class SellerRequestService {
         }
 
         request.setStatus(SellerRequest.RequestStatus.APPROVED);
-        request.setUpdatedDate(Date.valueOf(LocalDate.now()));
+        request.setUpdatedDate(LocalDateTime.now());
         request.setRejectionReason(null);
 
         SellerRequest saved = repository.save(request);
@@ -116,7 +126,7 @@ public class SellerRequestService {
                 .orElseThrow(() -> new RuntimeException("Request not found"));
 
         request.setStatus(SellerRequest.RequestStatus.REJECTED);
-        request.setUpdatedDate(Date.valueOf(LocalDate.now()));
+        request.setUpdatedDate(LocalDateTime.now());
         request.setRejectionReason(reason);
         
         SellerRequest saved = repository.save(request);

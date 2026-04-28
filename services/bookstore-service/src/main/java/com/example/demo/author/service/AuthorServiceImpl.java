@@ -31,7 +31,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public AuthorDTO createAuthor(CreateAuthorDTO createAuthorDTO) throws AlreadyExistingException {
         Author newAuthor = convertToEntity(createAuthorDTO);
-        if (repository.findAll().contains(newAuthor)){
+        if (repository.findByName(newAuthor.getName()).isPresent()){
             throw new AlreadyExistingException("el autor ya existe");
         }
         Author savedAuthor= repository.save(newAuthor);
@@ -80,7 +80,10 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author convertToEntity(CreateAuthorDTO createAuthorDTO) {
-        return new Author(createAuthorDTO.getName(),createAuthorDTO.getBirthDate());
+        return Author.builder()
+                .name(createAuthorDTO.getName())
+                .birthDate(createAuthorDTO.getBirthDate())
+                .build();
     }
 
     @Override

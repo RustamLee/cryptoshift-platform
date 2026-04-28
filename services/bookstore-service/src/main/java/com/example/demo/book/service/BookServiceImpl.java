@@ -201,7 +201,15 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public Book convertToEntity(CreateBookDTO createBookDTO) {
-        Book b = new Book(createBookDTO.getName(), createBookDTO.getDescription(),createBookDTO.getPrice(), createBookDTO.getStock(),createBookDTO.getAuthor(),createBookDTO.getGenres(),createBookDTO.getSeller());
+        Book b = Book.builder()
+                .name(createBookDTO.getName())
+                .description(createBookDTO.getDescription())
+                .price(createBookDTO.getPrice())
+                .stock(createBookDTO.getStock())
+                .author(createBookDTO.getAuthor())
+                .genres(createBookDTO.getGenres())
+                .seller(createBookDTO.getSeller())
+                .build();
         b.setImageUrl(createBookDTO.getImageUrl());
         return b;
     }

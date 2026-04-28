@@ -109,7 +109,12 @@ public class SellerProfileServiceImpl implements SellerProfileService{
 
     @Override
     public SellerProfile convertToEntity(CreateSellerProfileDTO createSellerProfileDTO) {
-        return new SellerProfile(createSellerProfileDTO.getName(), createSellerProfileDTO.getAddress(), createSellerProfileDTO.getAfipNumber(), createSellerProfileDTO.getSellerUser());
+        return SellerProfile.builder()
+                .name(createSellerProfileDTO.getName())
+                .address(createSellerProfileDTO.getAddress())
+                .afipNumber(createSellerProfileDTO.getAfipNumber())
+                .build();
+
     }
 
     public SellerProfileDTOFull convertToFullDTO(SellerProfile sellerProfile){

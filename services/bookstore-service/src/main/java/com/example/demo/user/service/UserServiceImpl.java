@@ -296,7 +296,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User convertToEntity(CreateUserDTO createUserDTO) {
-        return new User(createUserDTO.getName(), createUserDTO.getPassword());
+        return User.builder()
+                .name(createUserDTO.getName())
+                .password(createUserDTO.getPassword())
+                .build();
     }
 
     @Override

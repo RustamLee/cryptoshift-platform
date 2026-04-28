@@ -7,9 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
@@ -24,10 +24,11 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -43,9 +44,11 @@ public class Order {
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id")
     )
-    private List<Book> books;
+    @Builder.Default
+    private List<Book> books = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
     private BigDecimal totalPrice;
