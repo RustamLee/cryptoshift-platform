@@ -1,4 +1,5 @@
 package com.example.demo.user.service;
+
 import com.example.demo.configuration.CurrentUserUtils;
 import com.example.demo.exceptions.AlreadyExistingException;
 import com.example.demo.exceptions.NotFoundException;
@@ -12,6 +13,7 @@ import com.example.demo.book.model.Book;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -58,14 +60,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user.map(this::convertToDTO);
     }
 
+    @Override
+    public Optional<User> findByName(String name) {
+        return repository.findByName(name);
+    }
 
     public User getCurrentUser() throws NotFoundException {
-        String name= CurrentUserUtils.getUsername();
-        Optional<User> user = repository.findByName(name);
-        if (user.isEmpty()){
-            throw new NotFoundException("Necesitas iniciar sesion");
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        try {
+            Long id = Long.parseLong(userId);
+            return repository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Necesitas iniciar sesion"));
+        } catch (NumberFormatException e) {
+            throw new NotFoundException("Sesion invalida, ID de usuario no es un número: " + userId);
         }
-        return user.get();
     }
 
     @Override
@@ -192,7 +201,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     if (updateUserDTO.getName() != null) {
                         existing.setName(updateUserDTO.getName());
                     }
-                    
+
                     if (updateUserDTO.getPassword() != null) {
                         existing.setPassword(passwordEncoder.encode(updateUserDTO.getPassword()));
                     }
@@ -204,7 +213,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Optional<UserDTO> updateUserByAdmin(Long id, com.example.demo.user.dto.AdminUpdateUserDTO dto) throws NotFoundException, com.example.demo.exceptions.UnautorizedException {
         User current = getCurrentUser();
         boolean isAdmin = current.getRoles() != null && current.getRoles().contains("ROLE_ADMIN");
-        if (!isAdmin) throw new com.example.demo.exceptions.UnautorizedException("No esta autorizado para realizar esta acción");
+        if (!isAdmin)
+            throw new com.example.demo.exceptions.UnautorizedException("No esta autorizado para realizar esta acción");
 
         return repository.findById(id).map(existing -> {
             if (dto.getName() != null) existing.setName(dto.getName());
@@ -238,7 +248,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public boolean canDeleteUserById(Long id) throws NotFoundException, com.example.demo.exceptions.UnautorizedException {
         User current = getCurrentUser();
         boolean isAdmin = current.getRoles() != null && current.getRoles().contains("ROLE_ADMIN");
-        if (!isAdmin) throw new com.example.demo.exceptions.UnautorizedException("No esta autorizado para realizar esta acción");
+        if (!isAdmin)
+            throw new com.example.demo.exceptions.UnautorizedException("No esta autorizado para realizar esta acción");
 
         Optional<User> target = repository.findById(id);
         if (target.isEmpty()) {
@@ -268,10 +279,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<Book> addToUserCart(Book book, Integer cant) throws NotFoundException {
         User user = getCurrentUser();
         List<Book> bookList = user.getCart();
-        if (bookList == null){
-            bookList=new ArrayList<>();
+        if (bookList == null) {
+            bookList = new ArrayList<>();
         }
-        for (int i =0; i<cant; i++){
+        for (int i = 0; i < cant; i++) {
             bookList.add(book);
         }
         user.setCart(bookList);
@@ -281,7 +292,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<Book> removeFromUserCart(Book book, Integer cant) throws NotFoundException {
         User user = getCurrentUser();
         List<Book> bookList = user.getCart();
-        for (int i =0; i<cant; i++){
+        for (int i = 0; i < cant; i++) {
             bookList.remove(book);
         }
         user.setCart(bookList);
@@ -307,15 +318,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserDTO dto = new UserDTO(user.getId(), user.getName(), user.getRoles(), user.getStatus(), user.getIsTemporaryPassword());
         if (user.getSellerProfile() != null) {
             var sp = user.getSellerProfile();
-        java.util.List<BookDTOReduced> books = sp.getInventory() == null ? java.util.Collections.<BookDTOReduced>emptyList() : sp.getInventory().stream()
-            .map(b -> new BookDTOReduced(b.getId(), b.getName(), b.getDescription()))
-            .collect(java.util.stream.Collectors.toList());
+            java.util.List<BookDTOReduced> books = sp.getInventory() == null ? java.util.Collections.<BookDTOReduced>emptyList() : sp.getInventory().stream()
+                    .map(b -> new BookDTOReduced(b.getId(), b.getName(), b.getDescription()))
+                    .collect(java.util.stream.Collectors.toList());
             SellerProfileDTOFull sellerDto = new SellerProfileDTOFull(
-                sp.getId(),
-                sp.getName(),
-                sp.getAddress(),
-                sp.getAfipNumber(),
-                books
+                    sp.getId(),
+                    sp.getName(),
+                    sp.getAddress(),
+                    sp.getAfipNumber(),
+                    books
             );
             dto.setSellerProfile(sellerDto);
         }
@@ -334,14 +345,38 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = repository.findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-    List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
 
-    return new org.springframework.security.core.userdetails.User(
-        user.getName(),
-        user.getPassword(),
-        authorities
-    );
+        return new org.springframework.security.core.userdetails.User(
+                user.getName(),
+                user.getPassword(),
+                authorities
+        );
     }
+
+    public UserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
+        Long id;
+        try {
+            id = Long.parseLong(userId);
+        } catch (NumberFormatException e) {
+            throw new UsernameNotFoundException("ID de usuario inválido: " + userId);
+        }
+
+        User user = repository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con ID: " + userId));
+
+        List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getName(),
+                user.getPassword(),
+                authorities
+        );
+    }
+
+
 }

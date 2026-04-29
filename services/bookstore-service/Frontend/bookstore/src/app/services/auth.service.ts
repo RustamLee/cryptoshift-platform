@@ -28,6 +28,7 @@ export class AuthService {
 
   userSignal: WritableSignal<UserDTO | null> = signal(this.loadFromStorage());
   activeRole: WritableSignal<string | null> = signal(this.loadActiveRole());
+  hasPendingRequest: WritableSignal<boolean> = signal(false);
 
   get user(): UserDTO | null {
     return this.userSignal();
@@ -107,6 +108,7 @@ export class AuthService {
   }
 
   logout() {
+    console.trace('КТО ВЫЗВАЛ LOGOUT?');
     this.setCurrentUser(null);
     try {
       localStorage.removeItem(AUTH_TOKEN_KEY);

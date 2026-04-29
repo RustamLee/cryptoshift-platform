@@ -69,8 +69,9 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(username);
+    public String generateToken(Long userId,String username, List<String> roles) {
+        Claims claims = Jwts.claims().setSubject(userId.toString());
+        claims.put("username", username);
         claims.put("roles", roles);
 
         Date now = new Date();
@@ -95,6 +96,15 @@ public class JwtUtil {
 
     public String getUsername(String token) {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public String getUserId(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     public io.jsonwebtoken.Claims parseClaims(String token) {

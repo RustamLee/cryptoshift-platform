@@ -1,9 +1,9 @@
 package com.example.demo.configuration;
 
+import com.example.demo.user.service.UserServiceImpl;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import io.jsonwebtoken.Claims;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,10 +17,10 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
-    
+    private final UserServiceImpl userDetailsService;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserServiceImpl userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
@@ -34,10 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 boolean valid = jwtUtil.validateToken(token);
                 if (valid) {
-                    String username = jwtUtil.getUsername(token);
+                    String userId = jwtUtil.getUserId(token);
                     try {
-                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        UserDetails userDetails = userDetailsService.loadUserByUserId(userId);
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userId, null, userDetails.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(auth);
                     } catch (Exception ex) {
                         try {
@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     if (r != null) authorities.add(new SimpleGrantedAuthority(r.toString()));
                                 }
                             }
-                            UserDetails fallback = new org.springframework.security.core.userdetails.User(username, "", authorities);
+                            UserDetails fallback = new org.springframework.security.core.userdetails.User(userId, "", authorities);
                             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(fallback, null, authorities);
                             SecurityContextHolder.getContext().setAuthentication(auth);
                         } catch (Exception inner) {
@@ -57,6 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 

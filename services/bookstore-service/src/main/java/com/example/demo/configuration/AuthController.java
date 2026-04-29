@@ -1,6 +1,7 @@
 package com.example.demo.configuration;
 
 import com.example.demo.user.dto.UserDTO;
+import com.example.demo.user.model.User;
 import com.example.demo.user.service.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -57,13 +58,15 @@ public class AuthController {
             );
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            List<String> roles = auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-            String token = jwtUtil.generateToken(req.name, roles);
-
-            var user = userService.getCurrentUser();
+            User user = userService.findByName(req.name)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             if (user.getStatus() != null && "INACTIVE".equalsIgnoreCase(user.getStatus())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
+
+            List<String> roles = auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+            String token = jwtUtil.generateToken(user.getId(), user.getName(), roles);
+
             UserDTO dto = userService.convertToDTO(user);
 
             return ResponseEntity.ok(new AuthResponse(token, dto));

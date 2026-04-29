@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface UserService {
     Optional<UserDTO> getById(Long id);
     List<UserDTO> getAll();
+    Optional<User> findByName(String name);
     UserDTO createUser(CreateUserDTO createUserDTO) throws AlreadyExistingException;
     Optional<UserDTO> updateUser (UpdateUserDTO updateUserDTO) throws NotFoundException, UnautorizedException;
     boolean deleteUser() throws NotFoundException;

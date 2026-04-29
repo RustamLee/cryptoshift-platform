@@ -20,65 +20,67 @@ import { Subscription } from 'rxjs';
               [routerLink]="miProfileLink"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
-              >Mi perfil</a
+            >Mi perfil</a
             >
 
             @if (!isSellerRoute && !isAdmin) {
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/client/cards"
-              routerLinkActive="active"
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/client/cards"
+                routerLinkActive="active"
               >Mis tarjetas</a
-            >
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/client/compras"
-              routerLinkActive="active"
+              >
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/client/compras"
+                routerLinkActive="active"
               >Mis compras</a
-            >
+              >
             } @else if (isSellerRoute) {
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/seller/sales"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/seller/sales"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
               >Mis ventas</a
-            >
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/seller/catalog"
-              routerLinkActive="active"
+              >
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/seller/catalog"
+                routerLinkActive="active"
               >Mi catalogo</a
-            >
+              >
 
             } @else if (isAdmin) {
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/admin/genres"
-              routerLinkActive="active"
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/admin/genres"
+                routerLinkActive="active"
               >Gestión de Géneros</a
-            >
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/admin/authors"
-              routerLinkActive="active"
+              >
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/admin/authors"
+                routerLinkActive="active"
               >Gestión de Autores</a
-            >
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/admin/users"
-              routerLinkActive="active"
+              >
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/admin/users"
+                routerLinkActive="active"
               >Gestion de Usuarios</a
-            >
-            <a
-              class="profile-menu__item"
-              routerLink="/profile/admin/seller-requests"
-              routerLinkActive="active"
+              >
+              <a
+                class="profile-menu__item"
+                routerLink="/profile/admin/seller-requests"
+                routerLinkActive="active"
               >Solicitudes de vendedores</a
-            >
-            } @if (!isAdmin) {
-            <a class="profile-menu__item" (click)="openToggleConfirm()">{{ toggleLabel }}</a>
-
+              >
+            }
+            @if (!isAdmin) {
+              @if (!auth.hasPendingRequest() || auth.userSignal()?.roles?.includes('ROLE_SELLER') || isSellerRoute) {
+                <a class="profile-menu__item" (click)="openToggleConfirm()">{{ toggleLabel }}</a>
+              }
             }
           </nav>
         </aside>
@@ -89,17 +91,17 @@ import { Subscription } from 'rxjs';
     </div>
 
     @if (showConfirm) {
-    <div class="modal" (click)="cancelConfirm()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <button class="modal-close" aria-label="Cerrar" (click)="cancelConfirm()">×</button>
-        <h3>{{ confirmTitle }}</h3>
-        <p>{{ confirmMessage }}</p>
-        <div class="modal-actions">
-          <button class="btn-primary" (click)="confirmSwitch()">Sí, continuar</button>
-          <button class="btn-secondary" (click)="cancelConfirm()">Cancelar</button>
+      <div class="modal" (click)="cancelConfirm()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <button class="modal-close" aria-label="Cerrar" (click)="cancelConfirm()">×</button>
+          <h3>{{ confirmTitle }}</h3>
+          <p>{{ confirmMessage }}</p>
+          <div class="modal-actions">
+            <button class="btn-primary" (click)="confirmSwitch()">Sí, continuar</button>
+            <button class="btn-secondary" (click)="cancelConfirm()">Cancelar</button>
+          </div>
         </div>
       </div>
-    </div>
     }
   `,
   styleUrls: ['./profile.css'],

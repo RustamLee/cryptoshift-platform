@@ -51,7 +51,7 @@ public class SellerProfileControler {
     public ResponseEntity<SellerProfileDTOFull> getMySellerProfile() {
         try {
             Optional<SellerProfileDTOFull> seller = sellerProfileService.getCurrentSellerProfile();
-            return seller.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+            return seller.map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

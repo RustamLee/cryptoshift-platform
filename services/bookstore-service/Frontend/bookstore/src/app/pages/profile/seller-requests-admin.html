@@ -15,13 +15,17 @@
         <ng-template #statusTpl let-row>
           <i [ngClass]="[getStatusIconClass(row.status), getStatusClass(row.status), 'status-icon']"></i>
         </ng-template>
+        <ng-template #dateTpl let-row>
+          {{ row.createdDate | date: 'dd/MM/yyyy HH:mm' }}
+        </ng-template>
+
 
         <app-profile-table
           [columns]="columns"
           [keys]="keys"
           [rows]="requests"
           [actionsTemplate]="actionsTpl"
-          [cellTemplates]="{ status: statusTpl }"
+          [cellTemplates]="{ status: statusTpl, createdDate: dateTpl }"
         ></app-profile-table>
 
         <ng-template #actionsTpl let-row>

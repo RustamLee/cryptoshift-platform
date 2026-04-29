@@ -1,12 +1,12 @@
-import { Component, WritableSignal, signal, effect, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { Subscription } from 'rxjs';
-import { SellerProfileService, SellerProfileDTOFull } from '../../services/seller-profile.service';
-import { SellerRequestService, SellerRequestDTO } from '../../services/seller-request.service';
-import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
+import {Component, WritableSignal, signal, effect, OnDestroy} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {Router, RouterModule, ActivatedRoute} from '@angular/router';
+import {AuthService} from '../../services/auth.service';
+import {Subscription} from 'rxjs';
+import {SellerProfileService, SellerProfileDTOFull} from '../../services/seller-profile.service';
+import {SellerRequestService, SellerRequestDTO} from '../../services/seller-request.service';
+import {ConfirmDialogComponent} from '../../shared/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-profile',
@@ -79,10 +79,11 @@ export class ProfileComponent implements OnDestroy {
         try {
           this.router.navigate([], {
             relativeTo: this.route,
-            queryParams: { openSellerModal: null },
+            queryParams: {openSellerModal: null},
             replaceUrl: true,
           });
-        } catch (e) {}
+        } catch (e) {
+        }
       }
     });
   }
@@ -132,13 +133,13 @@ export class ProfileComponent implements OnDestroy {
     this.isUpdatingEmail = true;
     this.emailUpdateError = null;
     this.auth
-      .updateUser({ name: emailTrim, currentPassword: this.emailCurrentPassword })
+      .updateUser({name: emailTrim, currentPassword: this.emailCurrentPassword})
       .subscribe({
         next: () => {
           try {
             localStorage.removeItem('basicAuth');
-            localStorage.removeItem('jwtToken');
-          } catch (e) {}
+          } catch (e) {
+          }
           this.isUpdatingEmail = false;
           this.showEmailModal = false;
           this.emailCurrentPassword = '';
@@ -183,7 +184,7 @@ export class ProfileComponent implements OnDestroy {
     })();
 
     if (!this.auth.userSignal() || !tokenPresent) {
-      this.router.navigate(['/login'], { queryParams: { returnUrl: '/profile' } });
+      this.router.navigate(['/login'], {queryParams: {returnUrl: '/profile'}});
       return;
     }
 
@@ -204,7 +205,7 @@ export class ProfileComponent implements OnDestroy {
     })();
 
     if (!this.auth.userSignal() || !tokenPresent) {
-      this.router.navigate(['/login'], { queryParams: { returnUrl: '/profile' } });
+      this.router.navigate(['/login'], {queryParams: {returnUrl: '/profile'}});
       return;
     }
 
@@ -240,6 +241,7 @@ export class ProfileComponent implements OnDestroy {
             this.sellerAddress = '';
             this.sellerAfipNumber = '';
             this.sellerRequest.set(request);
+            this.auth.hasPendingRequest.set(true);
             this.emailUpdateError = 'Tu solicitud ha sido enviada. El administrador la revisará pronto.';
           };
           const elapsed = Date.now() - start;
@@ -289,8 +291,10 @@ export class ProfileComponent implements OnDestroy {
       try {
         const inputEl = e?.target as HTMLInputElement | null;
         if (inputEl) inputEl.value = formatted;
-      } catch (err) {}
-    } catch (err) {}
+      } catch (err) {
+      }
+    } catch (err) {
+    }
   }
 
   formatAfipNumber(digits: string): string {
@@ -306,7 +310,8 @@ export class ProfileComponent implements OnDestroy {
       if (/\D/.test(String(data))) {
         e.preventDefault();
       }
-    } catch (err) {}
+    } catch (err) {
+    }
   }
 
   onPasteAfip(e: ClipboardEvent): void {
@@ -323,9 +328,11 @@ export class ProfileComponent implements OnDestroy {
       try {
         const input = document.activeElement as HTMLInputElement | null;
         if (input && input.id === 'sellerAfipNumber') input.value = formatted;
-      } catch (err) {}
+      } catch (err) {
+      }
       this.onInput('afip');
-    } catch (err) {}
+    } catch (err) {
+    }
   }
 
   allowDigitKeydown(e: KeyboardEvent): void {
@@ -361,19 +368,18 @@ export class ProfileComponent implements OnDestroy {
   }
 
   loadSellerRequestIfNeeded(): void {
-
     this.sellerProfileService.getMySellerProfile().subscribe({
       next: (profile) => {
-        this.sellerProfile.set(profile);
-        this.sellerRequest.set(null);
+        if (profile) {
+          this.sellerProfile.set(profile);
+          this.sellerRequest.set(null);
+          this.auth.hasPendingRequest.set(false);
+        } else {
+          this.fetchRequestStatus();
+        }
       },
       error: () => {
-        this.sellerRequestService.getCurrentUserRequest().subscribe({
-          next: (request) => {
-            this.sellerRequest.set(request);
-          },
-          error: () => this.sellerRequest.set(null),
-        });
+        this.fetchRequestStatus();
       }
     });
   }
@@ -399,6 +405,7 @@ export class ProfileComponent implements OnDestroy {
         this.withdrawLoading = false;
         this.showWithdrawConfirm = false;
         this.sellerRequest.set(null);
+        this.auth.hasPendingRequest.set(false);
         this.emailUpdateError = 'Solicitud retirada exitosamente.';
       },
       error: (err) => {
@@ -413,5 +420,19 @@ export class ProfileComponent implements OnDestroy {
     this.showWithdrawConfirm = false;
     this.withdrawError = null;
   }
+
+  private fetchRequestStatus(): void {
+    this.sellerRequestService.getCurrentUserRequest().subscribe({
+      next: (request) => {
+        this.sellerRequest.set(request || null);
+        this.auth.hasPendingRequest.set(request?.status === 'PENDING');
+      },
+      error: () => {
+        this.sellerRequest.set(null);
+        this.auth.hasPendingRequest.set(false);
+      }
+    });
+  }
+
 }
 
