@@ -49,7 +49,7 @@ public class OrderControler {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderDTO> updateSale(@PathVariable Long id, @RequestBody UpdateOrderDTO updateOrderDTO){
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody UpdateOrderDTO updateOrderDTO){
         Optional<OrderDTO> updatedSale = orderService.updateOrder(id, updateOrderDTO);
         return updatedSale.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

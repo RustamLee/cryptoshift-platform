@@ -94,10 +94,6 @@ public class JwtUtil {
         }
     }
 
-    public String getUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody().getSubject();
-    }
-
     public String getUserId(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

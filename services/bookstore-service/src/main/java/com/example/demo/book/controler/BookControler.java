@@ -145,11 +145,4 @@ public class BookControler {
             return ResponseEntity.badRequest().build();
         }
     }
-
-    @GetMapping("/statistics/books-per-author")
-    public ResponseEntity<Map<String, Long>> getBooksPerAuthor(){
-        return ResponseEntity.ok(bookService.countBooksPerAuthor());
-    }
-
-
 }

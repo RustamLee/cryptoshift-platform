@@ -61,16 +61,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDTO> getAll() {
-        String current = CurrentUserUtils.getUsername();
-        org.slf4j.LoggerFactory.getLogger(OrderServiceImpl.class).debug("[OrderService] getAll called, CurrentUserUtils.getUsername()='{}'", current);
-        return repository.findAll().stream().filter(order -> {
-            try {
-                return order.getUser() != null && order.getUser().getName().equals(current);
-            } catch (Exception e) {
-                org.slf4j.LoggerFactory.getLogger(OrderServiceImpl.class).warn("[OrderService] error checking order user", e);
-                return false;
-            }
-        }).map(this::convertToDTO).collect(Collectors.toList());
+        try{
+            User currentUser = userService.getCurrentUser();
+            return repository.findAllByUserId(currentUser.getId())
+                    .stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        } catch (NotFoundException e) {
+            org.slf4j.LoggerFactory.getLogger(OrderServiceImpl.class).error("[OrderService] getAll failed: {}", e.getMessage());
+        }
+        return List.of();
     }
 
     @Override
@@ -218,28 +218,4 @@ public class OrderServiceImpl implements OrderService {
                 order.getTotalPrice()
         );
     }
-
-    public OrderDTO confirmOrder(Long orderId) throws NotFoundException, IOException {
-        Order order = repository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Order not found"));
-
-        if (order.getStatus() == OrderStatus.PAID) {
-            return convertToDTO(order);
-        }
-
-        order.setStatus(OrderStatus.PAID);
-        Order savedOrder = repository.save(order);
-
-        BigDecimal total = savedOrder.getTotalPrice();
-
-        sendOrderEmail(order.getUser().getName(), "<h1>Gracias por su compra</h1><p>Detalles de la compra:</p><ul>" +
-                savedOrder.getBooks().stream()
-                        .map(book -> "<li>" + book.getName() + " - $" + book.getPrice() + "</li>")
-                        .collect(Collectors.joining()) +
-                "</ul><p>Total: $" + total.toPlainString() + "</p>");
-
-        return convertToDTO(savedOrder);
-    }
-
-
 }

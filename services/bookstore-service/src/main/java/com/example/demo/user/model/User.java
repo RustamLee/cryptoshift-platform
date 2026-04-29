@@ -59,6 +59,7 @@ public class User {
 
     @OneToMany(mappedBy = "owner")
     @Builder.Default
+    @ToString.Exclude
     private List<Card> cards= new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)

@@ -12,6 +12,7 @@ import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.exceptions.UnautorizedException;
 import com.example.demo.user.model.User;
 import com.example.demo.user.service.UserServiceImpl;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,16 +32,17 @@ public class CardServiceImpl implements CardService{
 
     @Override
     public List<CardDTO> getAll() {
-        String current = CurrentUserUtils.getUsername();
-        org.slf4j.LoggerFactory.getLogger(CardServiceImpl.class).debug("[CardService] getAll called, CurrentUserUtils.getUsername()='{}'", current);
-        return repository.findAll().stream().filter(card -> {
-            try {
-                return card.getOwner() != null && card.getOwner().getName().equals(current);
-            } catch (Exception e) {
-                org.slf4j.LoggerFactory.getLogger(CardServiceImpl.class).warn("[CardService] error checking card owner", e);
-                return false;
-            }
-        }).map(this::convertToDTO).collect(Collectors.toList());
+        try{
+        User currentUser = userService.getCurrentUser();
+        LoggerFactory.getLogger(CardServiceImpl.class).debug("[CardService] getAll called, CurrentUserUtils.getUsername()='{}'", currentUser.getId());
+        return repository.findAllByOwnerId(currentUser.getId())
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        }catch (NotFoundException e){
+            LoggerFactory.getLogger(CardServiceImpl.class).error("[CardService] getAll failed: {}", e.getMessage());
+        }
+        return List.of();
     }
 
     @Override
@@ -56,9 +58,6 @@ public class CardServiceImpl implements CardService{
         return repository.findById(id);
     }
 
-    public Optional<Card> getByCardNumber(String cardNumber){
-        return repository.findByCardNumber(cardNumber);
-    }
 
     @Override
     public CardDTO createCard(CreateCardDTO createCardDTO) throws AlreadyExistingException, NotFoundException {

@@ -63,7 +63,9 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public List<BookDTOReduced> getAll() {
-        return repository.findAll().stream().map(this::reduceBook).collect(Collectors.toList());
+        return repository.findAllByAvailableTrue().stream()
+                .map(this::reduceBook)
+                .collect(Collectors.toList());
     }
 
     public List<BookDTO> getCart() throws NotFoundException {
@@ -72,18 +74,28 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public Optional<BookDTO> getById(Long id) {
-        Optional<Book> book = repository.findById(id);
-        return book.map(this::convertToDTO);
+        return repository.findById(id)
+                .filter(Book::getAvailable)
+                .map(this::convertToDTO);
     }
+
 
     @Override
     public boolean deleteBook(Long id) throws UnautorizedException {
-        Optional<Book> book = repository.findById(id);
-        if (book.isPresent() && !book.get().getSeller().getSellerUser().getName().equals(CurrentUserUtils.getUsername())){
+        User currentUser;
+        try{
+            currentUser = userService.getCurrentUser();
+        } catch (NotFoundException e){
+            throw new UnautorizedException("Usuario no encontrado");
+        }
+        Optional<Book> bookOptional = repository.findById(id);
+        if (bookOptional.isPresent() && !bookOptional.get().getSeller().getSellerUser().getId().equals(currentUser.getId())){
             throw new UnautorizedException("No esta autorizado para realizar esta acción");
         }
-        if (book.isPresent()){
-            repository.deleteById(id);
+        if (bookOptional.isPresent()){
+            Book book = bookOptional.get();
+            book.setAvailable(false);
+            repository.save(book);
             return true;
         }else {
             return false;
@@ -120,7 +132,13 @@ public class BookServiceImpl implements BookService{
     @Override
     public Optional<BookDTO> updateBook(Long id, UpdateBookDTO updateBookDTO) throws UnautorizedException {
         Optional<Book> book = repository.findById(id);
-        if (book.isPresent() && !book.get().getSeller().getSellerUser().getName().equals(CurrentUserUtils.getUsername())){
+        User currentUser;
+        try{
+            currentUser = userService.getCurrentUser();
+        } catch (NotFoundException e){
+            throw new UnautorizedException("Usuario no encontrado");
+        }
+        if (book.isPresent() && !book.get().getSeller().getSellerUser().getId().equals(currentUser.getId())){
             throw new UnautorizedException("No esta autorizado para realizar esta acicon");
         }
         return repository.findById(id)
@@ -231,24 +249,6 @@ public class BookServiceImpl implements BookService{
         return new BookDTOReduced(book.getId(), book.getName(), book.getDescription(), book.getPrice(), book.getStock(), reduceAuthor(book.getAuthor()), genres, book.getImageUrl());
     }
 
-    public List<BookDTO> getBooksByFilter(Optional<UUID> genreId, Optional<UUID> authorId) {
-        Specification<Book> spec = Specification.allOf(
-                BookSpecification.hasGenre(genreId),
-                BookSpecification.hasAuthor(authorId)
-        );
-
-        System.out.println("Specification: " + spec);
-
-        return repository.findAll(spec).stream()
-                .map(this::convertToDTO)
-                .toList();
-    }
-
-
-    public List<BookDTO> getBooksByFilterByIds(Optional<Long> genreId, Optional<Long> authorId) {
-        List<Long> list = genreId.map(Collections::singletonList).orElse(null);
-        return getBooksByFilterByIdList(Optional.ofNullable(list), authorId);
-    }
 
     public List<BookDTO> getBooksByFilterByIdList(Optional<List<Long>> genreIdsOpt, Optional<Long> authorId) {
         List<Book> all = repository.findAll();
