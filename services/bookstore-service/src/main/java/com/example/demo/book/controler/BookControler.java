@@ -5,6 +5,8 @@ import com.example.demo.book.dto.BookDTOReduced;
 import com.example.demo.book.dto.CreateBookDTO;
 import com.example.demo.book.dto.UpdateBookDTO;
 import com.example.demo.book.service.BookServiceImpl;
+import com.example.demo.cartitem.dto.CartItemDTO;
+import com.example.demo.cartitem.model.CartItem;
 import com.example.demo.exceptions.AlreadyExistingException;
 import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.exceptions.UnautorizedException;
@@ -29,9 +31,9 @@ public class BookControler {
 
 
     @GetMapping("/cart")
-    public ResponseEntity<List<BookDTO>> getCart() {
+    public ResponseEntity<List<CartItemDTO>> getCart() {
         try {
-            List<BookDTO> list = bookService.getCart();
+            List<CartItemDTO> list = bookService.getCart();
             return ResponseEntity.ok(list);
         }catch (NotFoundException e){
             return ResponseEntity.notFound().build();
@@ -122,9 +124,9 @@ public class BookControler {
     }
 
     @PutMapping("/add/{id}")
-    public ResponseEntity<List<BookDTOReduced>> addBookToCart(@PathVariable Long id,@RequestBody Integer cant){
+    public ResponseEntity<List<CartItemDTO>> addBookToCart(@PathVariable Long id,@RequestBody Integer cant){
         try{
-            List<BookDTOReduced> list=bookService.addToCart(id,cant);
+            List<CartItemDTO> list=bookService.addToCart(id,cant);
             return ResponseEntity.ok(list);
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -135,9 +137,9 @@ public class BookControler {
     }
 
     @PutMapping("/remove/{id}")
-    public ResponseEntity<List<BookDTOReduced>> removeBookfromCart(@PathVariable Long id,@RequestBody Integer cant){
+    public ResponseEntity<List<CartItemDTO>> removeBookfromCart(@PathVariable Long id,@RequestBody Integer cant){
         try{
-            List<BookDTOReduced> list=bookService.removeFromCart(id,cant);
+            List<CartItemDTO> list=bookService.removeFromCart(id,cant);
             return ResponseEntity.ok(list);
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();

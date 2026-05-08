@@ -10,6 +10,8 @@ import com.example.demo.book.dto.CreateBookDTO;
 import com.example.demo.book.dto.UpdateBookDTO;
 import com.example.demo.book.model.Book;
 import com.example.demo.book.repository.BookRepository;
+import com.example.demo.cartitem.dto.CartItemDTO;
+import com.example.demo.cartitem.model.CartItem;
 import com.example.demo.configuration.BookSpecification;
 import com.example.demo.configuration.CurrentUserUtils;
 import com.example.demo.exceptions.AlreadyExistingException;
@@ -30,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class BookServiceImpl implements BookService{
+public class BookServiceImpl implements BookService {
 
     private final BookRepository repository;
     private final AuthorServiceImpl authorService;
@@ -51,10 +53,10 @@ public class BookServiceImpl implements BookService{
         Book newBook = convertToEntity(createBookDTO);
         User user = userService.getCurrentUser();
         newBook.setSeller(user.getSellerProfile());
-        if(repository.findAll().contains(newBook)){
+        if (repository.findAll().contains(newBook)) {
             throw new AlreadyExistingException("Este libro ye existe");
         }
-        if(user.getSellerProfile() == null){
+        if (user.getSellerProfile() == null) {
             throw new NotFoundException("No estas registrado como vendedor");
         }
         Book savedBook = repository.save(newBook);
@@ -68,8 +70,16 @@ public class BookServiceImpl implements BookService{
                 .collect(Collectors.toList());
     }
 
-    public List<BookDTO> getCart() throws NotFoundException {
-        return userService.getCurrentUser().getCart().stream().map(this::convertToDTO).collect(Collectors.toList());
+    public List<CartItemDTO> getCart() throws NotFoundException {
+        List<CartItem> cartItems = userService.getCart();
+
+        return cartItems.stream()
+                .map(item -> CartItemDTO.builder()
+                        .id(item.getId())
+                        .book(reduceBook(item.getBook()))
+                        .quantity(item.getQuantity())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -83,43 +93,56 @@ public class BookServiceImpl implements BookService{
     @Override
     public boolean deleteBook(Long id) throws UnautorizedException {
         User currentUser;
-        try{
+        try {
             currentUser = userService.getCurrentUser();
-        } catch (NotFoundException e){
+        } catch (NotFoundException e) {
             throw new UnautorizedException("Usuario no encontrado");
         }
         Optional<Book> bookOptional = repository.findById(id);
-        if (bookOptional.isPresent() && !bookOptional.get().getSeller().getSellerUser().getId().equals(currentUser.getId())){
+        if (bookOptional.isPresent() && !bookOptional.get().getSeller().getSellerUser().getId().equals(currentUser.getId())) {
             throw new UnautorizedException("No esta autorizado para realizar esta acción");
         }
-        if (bookOptional.isPresent()){
+        if (bookOptional.isPresent()) {
             Book book = bookOptional.get();
             book.setAvailable(false);
             repository.save(book);
             return true;
-        }else {
+        } else {
             return false;
         }
     }
 
-    public List<BookDTOReduced> addToCart (Long id, Integer cant) throws NotFoundException {
+    public List<CartItemDTO> addToCart(Long id, Integer cant) throws NotFoundException {
         Optional<Book> book = repository.findById(id);
-        if(book.isEmpty()){
+        if (book.isEmpty()) {
             throw new NotFoundException("Libro no encontrado");
-        }else if (cant < 0){
+        } else if (cant < 0) {
             throw new ArithmeticException("La cantidad no puede ser menor a 0");
         }
-        return userService.addToUserCart(book.get(),cant).stream().map(this::reduceBook).collect(Collectors.toList());
+        return userService.addToUserCart(book.get(), cant)
+                .stream()
+                .map(item -> CartItemDTO.builder()
+                        .id(item.getId())
+                        .book(reduceBook(item.getBook()))// Маппим вложенную книгу
+                        .quantity(item.getQuantity())
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    public List<BookDTOReduced> removeFromCart (Long id, Integer cant) throws NotFoundException {
+    public List<CartItemDTO> removeFromCart(Long id, Integer cant) throws NotFoundException {
         Optional<Book> book = repository.findById(id);
-        if(book.isEmpty()){
+        if (book.isEmpty()) {
             throw new NotFoundException("Libro no encontrado");
-        }else if (cant <=0){
+        } else if (cant <= 0) {
             throw new ArithmeticException("La cantidad no puede ser 0 o menor");
         }
-        return userService.removeFromUserCart(book.get(),cant).stream().map(this::reduceBook).collect(Collectors.toList());
+        return userService.removeFromUserCart(book.get(), cant).stream()
+                .map(item -> CartItemDTO.builder()
+                        .id(item.getId())
+                        .book(reduceBook(item.getBook()))
+                        .quantity(item.getQuantity())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -133,35 +156,35 @@ public class BookServiceImpl implements BookService{
     public Optional<BookDTO> updateBook(Long id, UpdateBookDTO updateBookDTO) throws UnautorizedException {
         Optional<Book> book = repository.findById(id);
         User currentUser;
-        try{
+        try {
             currentUser = userService.getCurrentUser();
-        } catch (NotFoundException e){
+        } catch (NotFoundException e) {
             throw new UnautorizedException("Usuario no encontrado");
         }
-        if (book.isPresent() && !book.get().getSeller().getSellerUser().getId().equals(currentUser.getId())){
+        if (book.isPresent() && !book.get().getSeller().getSellerUser().getId().equals(currentUser.getId())) {
             throw new UnautorizedException("No esta autorizado para realizar esta acicon");
         }
         return repository.findById(id)
-                .map(existing ->{
-                    if (updateBookDTO.getName() != null){
+                .map(existing -> {
+                    if (updateBookDTO.getName() != null) {
                         existing.setName(updateBookDTO.getName());
                     }
-                    if (updateBookDTO.getDescription() != null){
+                    if (updateBookDTO.getDescription() != null) {
                         existing.setDescription(updateBookDTO.getDescription());
                     }
-                    if (updateBookDTO.getPrice() != null){
+                    if (updateBookDTO.getPrice() != null) {
                         existing.setPrice(updateBookDTO.getPrice());
                     }
-                    if (updateBookDTO.getStock() != null){
+                    if (updateBookDTO.getStock() != null) {
                         existing.setStock(updateBookDTO.getStock());
                     }
-                    if (updateBookDTO.getAuthor() != null){
+                    if (updateBookDTO.getAuthor() != null) {
                         existing.setAuthor(updateBookDTO.getAuthor());
                     }
-                    if (updateBookDTO.getGenres() != null){
+                    if (updateBookDTO.getGenres() != null) {
                         existing.setGenres(updateBookDTO.getGenres());
                     }
-                    if (updateBookDTO.getSeller() != null){
+                    if (updateBookDTO.getSeller() != null) {
                         existing.setSeller(updateBookDTO.getSeller());
                     }
                     if (updateBookDTO.getImageUrl() != null) {
@@ -172,30 +195,28 @@ public class BookServiceImpl implements BookService{
                 });
     }
 
-    public void updateStock(List<Book> cart) throws InsufficientStockException, NotFoundException {
-        Map<Book, Long> bookCounts = cart.stream()
-                .collect(Collectors.groupingBy(book -> book, Collectors.counting()));
+    public void updateStock(List<CartItem> cartItems) throws InsufficientStockException, NotFoundException {
+        for (CartItem item : cartItems) {
+            Book book = item.getBook();
+            int quantityToBuy = item.getQuantity();
 
-        for (Map.Entry<Book, Long> entry : bookCounts.entrySet()) {
-            Book book = entry.getKey();
-            long quantity = entry.getValue();
+            Book persistentBook = repository.findById(book.getId())
+                    .orElseThrow(() -> new NotFoundException("Libro no encontrado: " + book.getName()));
 
-            if (!repository.existsById(book.getId())) {
-                throw new NotFoundException("El libro no está disponible");
+            if (persistentBook.getStock() < quantityToBuy) {
+                throw new InsufficientStockException("Stock insuficiente para: " + persistentBook.getName());
             }
 
-            if (book.getStock() < quantity) {
-                throw new InsufficientStockException("Stock insuficiente para el libro: " + book.getName());
-            }
-            book.setStock(book.getStock() - (int) quantity);
+            persistentBook.setStock(persistentBook.getStock() - quantityToBuy);
 
-            if (book.getOrders() == null) {
-                book.setOrders(new ArrayList<>());
+            if (persistentBook.getStock() == 0) {
+                persistentBook.setAvailable(false);
             }
 
-            repository.save(book);
+            repository.save(persistentBook);
         }
     }
+
 
 
     @Override
@@ -203,7 +224,7 @@ public class BookServiceImpl implements BookService{
         Optional<AuthorDTO> autor = authorService.getById(id);
         if (autor.isPresent()) {
             return repository.findAll().stream().filter(book -> book.getAuthor().getId().equals(autor.get().getId())).map(this::reduceBook).collect(Collectors.toList());
-        }else {
+        } else {
             throw new NotFoundException("autor inexistente");
         }
     }
@@ -212,7 +233,7 @@ public class BookServiceImpl implements BookService{
         Optional<Genre> genre = genreService.getEntityById(id);
         if (genre.isPresent()) {
             return repository.findAll().stream().filter(book -> book.getGenres().contains(genre.get())).map(this::reduceBook).collect(Collectors.toList());
-        }else {
+        } else {
             throw new NotFoundException("genero inexistente");
         }
     }
@@ -235,13 +256,14 @@ public class BookServiceImpl implements BookService{
     @Override
     public BookDTO convertToDTO(Book book) {
         Set<GenreDTO> genres = book.getGenres().stream().map(g -> genreService.convertToDTO(g)).collect(Collectors.toSet());
-        return new BookDTO(book.getId(), book.getName(), book.getDescription(), book.getPrice(), book.getStock(),reduceAuthor(book.getAuthor()),genres, book.getImageUrl(), profileService.convertToDTO(book.getSeller()));
+        return new BookDTO(book.getId(), book.getName(), book.getDescription(), book.getPrice(), book.getStock(), reduceAuthor(book.getAuthor()), genres, book.getImageUrl(), profileService.convertToDTO(book.getSeller()));
     }
 
-    public AuthorDTOReduced reduceAuthor(Author author){
-        return new AuthorDTOReduced(author.getId(), author.getName(),author.getBirthDate());
+    public AuthorDTOReduced reduceAuthor(Author author) {
+        return new AuthorDTOReduced(author.getId(), author.getName(), author.getBirthDate());
     }
-    public BookDTOReduced reduceBook(Book book){
+
+    public BookDTOReduced reduceBook(Book book) {
         Set<com.example.demo.genre.dto.GenreDTO> genres = null;
         if (book.getGenres() != null) {
             genres = book.getGenres().stream().map(g -> genreService.convertToDTO(g)).collect(Collectors.toSet());
@@ -266,6 +288,14 @@ public class BookServiceImpl implements BookService{
         }).collect(Collectors.toList());
 
         return filtered.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    private CartItemDTO convertToCartItemDTO(CartItem item) {
+        return CartItemDTO.builder()
+                .id(item.getId())
+                .book(reduceBook(item.getBook()))
+                .quantity(item.getQuantity())
+                .build();
     }
 
 

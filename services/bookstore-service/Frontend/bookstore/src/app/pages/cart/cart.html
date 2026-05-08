@@ -57,28 +57,23 @@
                     <div class="cart-item__subtotal">${{ s.subtotal }}</div>
                 </article>
             </div>
+          <div *ngIf="paymentMode" class="payment-selection-wrapper">
 
-            <div *ngIf="paymentMode && userCards.length > 0" class="cards-list">
-                <article class="cart-item card-pay" *ngFor="let c of userCards" [class.selected]="selectedCardId === c.id">
-                    <div class="card-select">
-                        <input type="checkbox" [checked]="selectedCardId === c.id" (change)="onSelectCard(c.id)" />
-                    </div>
-                    <div class="card-number">**** {{ c.cardNumber.slice(-4) }}</div>
-                    <div class="card-bank">Banco: {{ c.bank }}</div>
-                </article>
+            <div class="crypto-info-box"
+                 style="padding: 20px; border: 2px dashed var(--first-color); border-radius: 8px; text-align: center; margin-bottom: 20px;">
+              <p style="margin-bottom: 10px;">Pagarás con <strong>Bitcoin</strong> a través de CryptoShift.</p>
+              <p style="color: var(--first-color); font-weight: 700;">Se generará una factura con precio congelado por 15 minutos.</p>
+            </div>
 
-                <div class="cards-actions modal-actions">
-                    <button class="btn-secondary" (click)="onCancelPayment()">Cancelar</button>
-                    <button class="btn-primary" [disabled]="!selectedCardId" (click)="onConfirmPayment()">Pagar</button>
-                </div>
+            <div class="cards-actions modal-actions" style="display: flex; gap: 12px; justify-content: center;">
+              <button class="btn-secondary" (click)="onCancelPayment()">Cancelar</button>
+              <button class="btn-primary" (click)="onConfirmPayment()">
+                Generar Factura BTC
+              </button>
             </div>
-            <div *ngIf="paymentMode && userCards.length === 0" class="no-cards">
-                <div class="empty-message">No tenés tarjetas guardadas para pagar.</div>
-                <div class="empty-actions modal-actions">
-                    <button class="btn-primary" (click)="onAddCard()">Agregar tarjeta</button>
-                    <button class="btn-secondary" (click)="onCancelPayment()">Cancelar</button>
-                </div>
-            </div>
+          </div>
+
+
         </section>
     </div>
 

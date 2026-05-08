@@ -140,7 +140,7 @@ body.dark-theme .card-select input[type="checkbox"]:focus{
 }
 .card-pay .cart-item__media { display:flex; align-items:center; justify-content:center }
 .cards-list { display:flex; flex-direction:column; gap:12px }
-.cards-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:12px }
+.cards-actions { display:flex; gap:12px; justify-content:center; margin-top:12px }
 
 .cards-actions .btn-primary,
 .cards-actions .btn-secondary {

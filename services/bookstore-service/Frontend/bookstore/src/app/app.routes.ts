@@ -16,7 +16,6 @@ import { SellerRequestsAdminComponent } from './pages/profile/seller-requests-ad
 import { SellerGuard } from './pages/profile/seller.guard';
 import { SellerResolver } from './pages/profile/seller.resolver';
 import { AboutComponent } from './pages/about/about';
-import { CardsClientComponent } from './pages/profile/cards-client';
 import { ComprasClientComponent } from './pages/profile/compras-client';
 import { CartComponent } from './pages/cart/cart';
 import { ChangePasswordComponent } from './pages/change-password/change-password';
@@ -31,7 +30,6 @@ export const routes: Routes = [
     component: ProfileWrapperComponent,
     children: [
       { path: 'client', component: ProfileComponent },
-      { path: 'client/cards', component: CardsClientComponent },
       { path: 'client/compras', component: ComprasClientComponent },
       {
         path: 'seller',

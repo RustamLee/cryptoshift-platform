@@ -1,5 +1,7 @@
 package com.example.demo.user.service;
 
+import com.example.demo.cartitem.model.CartItem;
+import com.example.demo.cartitem.repository.CartItemRepository;
 import com.example.demo.configuration.CurrentUserUtils;
 import com.example.demo.exceptions.AlreadyExistingException;
 import com.example.demo.exceptions.NotFoundException;
@@ -32,21 +34,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final com.example.demo.sellerprofile.repository.SellerProfileRepository sellerProfileRepository;
-    private final com.example.demo.cards.repository.CardsRepository cardsRepository;
     private final OrderRepository orderRepository;
     private final com.example.demo.book.repository.BookRepository bookRepository;
+    private final CartItemRepository cartItemRepository;
 
     public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder,
                            com.example.demo.sellerprofile.repository.SellerProfileRepository sellerProfileRepository,
-                           com.example.demo.cards.repository.CardsRepository cardsRepository,
                            OrderRepository orderRepository,
-                           com.example.demo.book.repository.BookRepository bookRepository) {
+                           com.example.demo.book.repository.BookRepository bookRepository, CartItemRepository cartItemRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.sellerProfileRepository = sellerProfileRepository;
-        this.cardsRepository = cardsRepository;
         this.orderRepository = orderRepository;
         this.bookRepository = bookRepository;
+        this.cartItemRepository = cartItemRepository;
     }
 
     @Override
@@ -145,13 +146,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 }
             }
 
-            var cards = cardsRepository.findAll();
-            for (var c : cards) {
-                if (c.getOwner() != null && c.getOwner().getId() != null && c.getOwner().getId().equals(id)) {
-                    c.setOwner(null);
-                    cardsRepository.save(c);
-                }
-            }
+
 
             var orders = orderRepository.findAll();
             for (var s : orders) {
@@ -276,32 +271,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         repository.save(user);
     }
 
-    public List<Book> addToUserCart(Book book, Integer cant) throws NotFoundException {
+    public List<CartItem> addToUserCart(Book book, Integer cant) throws NotFoundException {
         User user = getCurrentUser();
-        List<Book> bookList = user.getCart();
-        if (bookList == null) {
-            bookList = new ArrayList<>();
+
+        Optional<CartItem> existingItem = cartItemRepository.findByUserIdAndBookId(user.getId(), book.getId());
+
+        if (existingItem.isPresent()) {
+            CartItem item = existingItem.get();
+            item.setQuantity(item.getQuantity() + cant);
+            cartItemRepository.save(item);
+        } else {
+            CartItem newItem = CartItem.builder()
+                    .user(user)
+                    .book(book)
+                    .quantity(cant)
+                    .build();
+            cartItemRepository.save(newItem);
         }
-        for (int i = 0; i < cant; i++) {
-            bookList.add(book);
-        }
-        user.setCart(bookList);
-        return repository.save(user).getCart();
+
+        return cartItemRepository.findAllByUserId(user.getId());
     }
 
-    public List<Book> removeFromUserCart(Book book, Integer cant) throws NotFoundException {
+    public List<CartItem> removeFromUserCart(Book book, Integer cant) throws NotFoundException {
         User user = getCurrentUser();
-        List<Book> bookList = user.getCart();
-        for (int i = 0; i < cant; i++) {
-            bookList.remove(book);
+
+        CartItem item = cartItemRepository.findByUserIdAndBookId(user.getId(), book.getId())
+                .orElseThrow(() -> new NotFoundException("El libro no se encuentra en el carrito"));
+
+        int newQuantity = item.getQuantity() - cant;
+        if (newQuantity > 0) {
+            item.setQuantity(newQuantity);
+            cartItemRepository.save(item);
+        } else {
+            user.getCartItems().remove(item);
+            cartItemRepository.delete(item);
         }
-        user.setCart(bookList);
-        return repository.save(user).getCart();
+        return cartItemRepository.findAllByUserId(user.getId());
     }
 
     public void emptyCart() throws NotFoundException {
         User user = getCurrentUser();
-        user.setCart(new ArrayList<Book>());
+        user.getCartItems().clear();
         repository.save(user);
     }
 
@@ -376,6 +386,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getPassword(),
                 authorities
         );
+    }
+
+    @Override
+    public List<CartItem> getCart() throws NotFoundException {
+        User user = getCurrentUser();
+        return cartItemRepository.findAllByUserId(user.getId());
     }
 
 

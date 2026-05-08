@@ -21,10 +21,11 @@ public class RateUpdater {
     public void updateBtcRate() {
         try {
             BigDecimal price = binanceClient.fetchLatestPrice();
+            BigDecimal finalPrice = price.multiply(new BigDecimal("1.02"));
 
-            redisTemplate.opsForValue().set("rate:btc_usdt", price.toString());
+            redisTemplate.opsForValue().set("rate:btc_usdt", finalPrice.toString());
 
-            log.info(">>> Bitcoin rate was updated in Redis : {} USDT", price);
+            log.info(">>> Bitcoin rate was updated in Redis : {} USDT", finalPrice);
         } catch (Exception e) {
             log.error("!!! Error in updating the Bitcoin rate : {}", e.getMessage());
         }

@@ -26,12 +26,6 @@ import { Subscription } from 'rxjs';
             @if (!isSellerRoute && !isAdmin) {
               <a
                 class="profile-menu__item"
-                routerLink="/profile/client/cards"
-                routerLinkActive="active"
-              >Mis tarjetas</a
-              >
-              <a
-                class="profile-menu__item"
                 routerLink="/profile/client/compras"
                 routerLinkActive="active"
               >Mis compras</a

@@ -4,6 +4,7 @@ import com.example.demo.exceptions.InsufficientStockException;
 import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.order.dto.OrderDTO;
 import com.example.demo.order.dto.UpdateOrderDTO;
+import com.example.demo.order.model.PaymentMethod;
 import com.example.demo.order.service.OrderServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,16 +37,18 @@ public class OrderControler {
     }
 
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody Long id){
+    public ResponseEntity<?> createOrder(
+            @RequestParam PaymentMethod paymentMethod) {
         try {
-            OrderDTO orderDTO = orderService.createOrder(id);
+            OrderDTO orderDTO = orderService.createOrder(paymentMethod);
             return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
         } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (InsufficientStockException | IOException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (InsufficientStockException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not enough stock: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating order: " + e.getMessage());
         }
-
     }
 
     @PutMapping("/{id}")

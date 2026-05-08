@@ -68,7 +68,4 @@ public class Book {
     @Builder.Default
     private Boolean available = true;
 
-    @ManyToMany(mappedBy = "cart")
-    @Builder.Default
-    private List<User> cartUser= new ArrayList<>();
 }

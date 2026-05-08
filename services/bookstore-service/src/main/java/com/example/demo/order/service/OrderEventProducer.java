@@ -13,7 +13,6 @@ public class OrderEventProducer {
 
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
-    // Название топика (канала), куда шлем сообщение
     private static final String TOPIC = "order-placed-topic";
 
     public void sendOrderEvent(OrderPlacedEvent event) {

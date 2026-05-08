@@ -1,5 +1,6 @@
 package com.example.demo.user.service;
 
+import com.example.demo.cartitem.model.CartItem;
 import com.example.demo.exceptions.AlreadyExistingException;
 import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.exceptions.UnautorizedException;
@@ -23,4 +24,5 @@ public interface UserService {
     User convertToEntity(CreateUserDTO createUserDTO);
     UserDTO convertToDTO(User user);
     boolean canDeleteUserById(Long id) throws NotFoundException, UnautorizedException;
+    List<CartItem> getCart() throws NotFoundException;
 }

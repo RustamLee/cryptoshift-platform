@@ -1,7 +1,6 @@
 package com.example.demo.order.model;
 
 import com.example.demo.book.model.Book;
-import com.example.demo.cards.model.Card;
 import com.example.demo.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,9 +33,6 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "card_id")
-    private Card card;
 
     @ManyToMany
     @JoinTable(
@@ -52,4 +48,10 @@ public class Order {
     private OrderStatus status = OrderStatus.PENDING;
 
     private BigDecimal totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @Column(nullable = false)
+    private LocalDateTime expiresAt;
 }

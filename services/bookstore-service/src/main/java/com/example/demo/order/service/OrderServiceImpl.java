@@ -2,8 +2,7 @@ package com.example.demo.order.service;
 
 import com.example.demo.book.model.Book;
 import com.example.demo.book.service.BookServiceImpl;
-import com.example.demo.cards.model.Card;
-import com.example.demo.cards.service.CardServiceImpl;
+import com.example.demo.cartitem.model.CartItem;
 import com.example.demo.configuration.CurrentUserUtils;
 import com.example.demo.exceptions.InsufficientStockException;
 import com.example.demo.exceptions.NotFoundException;
@@ -13,6 +12,7 @@ import com.example.demo.order.dto.UpdateOrderDTO;
 import com.example.demo.order.event.OrderPlacedEvent;
 import com.example.demo.order.model.Order;
 import com.example.demo.order.model.OrderStatus;
+import com.example.demo.order.model.PaymentMethod;
 import com.example.demo.order.repository.OrderRepository;
 import com.example.demo.user.model.User;
 import com.example.demo.user.service.UserServiceImpl;
@@ -29,8 +29,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +42,13 @@ public class OrderServiceImpl implements OrderService {
     private final String emailApiKey;
     private final OrderRepository repository;
     private final UserServiceImpl userService;
-    private final CardServiceImpl cardService;
     private final BookServiceImpl bookService;
     private final OrderEventProducer orderEventProducer;
 
-    public OrderServiceImpl(OrderRepository repository, UserServiceImpl userService, CardServiceImpl cardService, BookServiceImpl bookService, Environment env, OrderEventProducer orderEventProducer) {
+    public OrderServiceImpl(OrderRepository repository, UserServiceImpl userService , BookServiceImpl bookService, Environment env, OrderEventProducer orderEventProducer) {
         this.orderEventProducer = orderEventProducer;
         this.repository = repository;
         this.userService = userService;
-        this.cardService = cardService;
         this.bookService = bookService;
 
         this.env = env;
@@ -85,51 +81,51 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO createOrder(Long cardId) throws NotFoundException, InsufficientStockException, IOException {
+    public OrderDTO createOrder(PaymentMethod paymentMethod) throws NotFoundException, InsufficientStockException, IOException {
         User user = userService.getCurrentUser();
-        List<Book> cart = new ArrayList<>(user.getCart());
+        List<CartItem> cartItems = user.getCartItems();
 
-        if(cart.isEmpty()){
-            throw new IllegalStateException("Cannot сreate order with an empty cart");
+        if (cartItems.isEmpty()) {
+            throw new IllegalStateException("Cannot create order with an empty cart");
         }
 
-        Optional<Card> card = cardService.getByIdNumber(cardId);
+        BigDecimal total = cartItems.stream()
+                .map(item -> item.getBook().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (card.isPresent() && user.getCards().contains(card.get())) {
-
-            cart.forEach(b -> org.slf4j.LoggerFactory.getLogger(OrderServiceImpl.class)
-                    .info("Book in cart: ID={}, Name={}, Price={}", b.getId(), b.getName(), b.getPrice()));
-
-            BigDecimal total = cart.stream()
-                    .map(Book::getPrice)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            Order newOrder = Order.builder()
-                    .date(LocalDateTime.now())
-                    .user(user)
-                    .card(card.get())
-                    .books(cart)
-                    .status(OrderStatus.PENDING)
-                    .totalPrice(total)
-                    .build();
-
-            Order savedOrder = repository.save(newOrder);
-
-            bookService.updateStock(user.getCart());
-            userService.emptyCart();
-
-            OrderPlacedEvent event = new OrderPlacedEvent(
-                    savedOrder.getId(),
-                    savedOrder.getTotalPrice(),
-                    user.getName()
-            );
-            orderEventProducer.sendOrderEvent(event);
-
-            return convertToDTO(savedOrder);
-        } else {
-            throw new NotFoundException("Card not found or does not belong to user");
+        List<Book> booksForOrder = new ArrayList<>();
+        for (CartItem item : cartItems) {
+            for (int i = 0; i < item.getQuantity(); i++) {
+                booksForOrder.add(item.getBook());
+            }
         }
+
+        OrderStatus status = paymentMethod == PaymentMethod.CRYPTO
+                ? OrderStatus.AWAITING_PAYMENT
+                : OrderStatus.PENDING;
+
+        Order newOrder = Order.builder()
+                .date(LocalDateTime.now())
+                .user(user)
+                .books(booksForOrder)
+                .status(status)
+                .totalPrice(total)
+                .paymentMethod(paymentMethod)
+                .build();
+        Order savedOrder = repository.save(newOrder);
+        bookService.updateStock(cartItems);
+        userService.emptyCart();
+
+        OrderPlacedEvent event = new OrderPlacedEvent(
+                savedOrder.getId(),
+                savedOrder.getTotalPrice(),
+                user.getName(),
+                paymentMethod
+        );
+        orderEventProducer.sendOrderEvent(event);
+        return convertToDTO(savedOrder);
     }
+
 
 
     @Override
@@ -152,9 +148,6 @@ public class OrderServiceImpl implements OrderService {
                     }
                     if (updateOrderDTO.getUser() != null) {
                         existing.setUser(updateOrderDTO.getUser());
-                    }
-                    if (updateOrderDTO.getCard() != null) {
-                        existing.setCard(updateOrderDTO.getCard());
                     }
                     if (updateOrderDTO.getBooks() != null) {
                         existing.setBooks(updateOrderDTO.getBooks());
@@ -197,25 +190,33 @@ public class OrderServiceImpl implements OrderService {
                 .map(Book::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        com.example.demo.order.model.OrderStatus status = createOrderDTO.getPaymentMethod() == com.example.demo.order.model.PaymentMethod.CRYPTO
+                ? com.example.demo.order.model.OrderStatus.AWAITING_PAYMENT
+                : com.example.demo.order.model.OrderStatus.PENDING;
+
         return Order.builder()
                 .date(createOrderDTO.getDate())
                 .user(createOrderDTO.getUser())
-                .card(createOrderDTO.getCard())
                 .books(createOrderDTO.getBooks())
-                .status(OrderStatus.PENDING)
+                .status(status)
                 .totalPrice(total)
+                .paymentMethod(createOrderDTO.getPaymentMethod())
                 .build();
     }
 
     @Override
     public OrderDTO convertToDTO(Order order) {
-        return new OrderDTO(
-                order.getId(),
-                order.getDate(),
-                userService.convertToDTO(order.getUser()),
-                cardService.reduceCard(order.getCard()),
-                order.getBooks().stream().map(bookService::reduceBook).collect(Collectors.toList()),
-                order.getTotalPrice()
-        );
+        return OrderDTO.builder()
+                .id(order.getId())
+                .date(order.getDate())
+                .user(userService.convertToDTO(order.getUser()))
+                .books(order.getBooks().stream()
+                        .map(bookService::reduceBook)
+                        .collect(Collectors.toList()))
+                .totalPrice(order.getTotalPrice())
+                .paymentMethod(order.getPaymentMethod())
+                .status(order.getStatus() != null ? order.getStatus().name() : null)
+                .expiresAt(order.getExpiresAt())
+                .build();
     }
 }
